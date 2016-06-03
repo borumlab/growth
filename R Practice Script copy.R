@@ -82,7 +82,7 @@ FFM <- ifelse(AGE < 18, FFM <- ARPADI_FFM, FFM <- KOTLER_FFM)
 BODY_FAT_PCTG <- ((Anthropometrics$WT-FFM)/Anthropometrics$WT)*100
 
 
-#can run below to double check what has been calculated so far
+
 #table <- cbind(AGE, BMI, AMC, UAA, AMA, AFA, VCA, VC_PCTG, Z, P, ARPADI_FFM, GORAN_FFM, ARPADI_TBW, SCHAEFER_FFM, KOTLER_FFM, BODY_FAT_PCTG)
 
 
@@ -99,7 +99,7 @@ SEX <- ifelse(Demographics.Identified$GENDER[1] == "M", 1, 2)
 #newHT
 HT <- floor(Anthropometrics$HT)
 
-#NHANES, still need to input data for weight for height
+#NHANES
 MEAN_NHANES_HT <- c()
 SD_NHANES_HT <- c()
 MEAN_NHANES_WT <- c()
@@ -269,7 +269,7 @@ NHANES_WT_HT_PCTL <- (pnorm(NHANES_WT_HT_Z))*100
 
 
 #CDC R script
-#yearfrac from EXCEL
+
 #same SEX as NHANES, need to calculate Age in months
 i=1:dim(Anthropometrics)[1]
 Bday <- as.Date(Anthropometrics$Birthdate[1], format= "%m/%d/%Y") #First convert classes from factor to date
@@ -522,11 +522,12 @@ R <- Anthropometrics$R
 X <- Anthropometrics$X
 
 
-#missing NHANES weight for height
+
 finaltable <- cbind.data.frame(MRNUMBER, DATE, DAY_TYPE, SOURCE, HT, WT, HC, UAC, TSF, SSF, USF, SISF, MBSF, WC, R, X, CDC_HT_PCTL, CDC_HT_Z, WHO_HT_PCTL, WHO_HT_Z, NHANES_HT_PCTL, NHANES_HT_Z, CDC_WT_PCTL, CDC_WT_Z, WHO_WT_PCTL, WHO_WT_Z, NHANES_WT_PCTL, NHANES_WT_Z, BMI,  CDC_BMI_PCTL, CDC_BMI_Z, WHO_BMI_PCTL, WHO_BMI_Z, NHANES_BMI_PCTL, NHANES_BMI_Z, CDC_WT_HT_PCTL, CDC_WT_HT_Z, WHO_WT_HT_PCTL, WHO_WT_HT_Z, NHANES_WT_HT_PCTL, NHANES_WT_HT_Z, CDC_HC_PCTL, CDC_HC_Z, WHO_HC_PCTL, WHO_HC_Z, WHO_UAC_PCTL, WHO_UAC_Z, NHANES_UAC_PCTL, NHANES_UAC_Z, WHO_TSF_PCTL, WHO_TSF_Z, NHANES_TSF_PCTL, NHANES_TSF_Z, UAA, NHANES_UAA_PCTL, NHANES_UAA_Z, AMC, AMA, NHANES_AMA_PCTL, NHANES_AMA_Z, AFA, NHANES_AFA_PCTL, NHANES_AFA_Z, WHO_SSF_PCTL, WHO_SSF_Z, NHANES_SSF_PCTL, NHANES_SSF_Z, NHANES_WC_PCTL, NHANES_WC_Z, VCA, VC_PCTG, GC, Z, P, ARPADI_FFM, GORAN_FFM, SCHAEFER_FFM, KOTLER_FFM, BODY_FAT_PCTG)
 finaltable[is.na(finaltable)] <- " "
 #above replaces NAs with blanks
 write.csv(x=finaltable, row.names= FALSE, file = "PracticeRaSo.csv")
+#whatever you want to name file, edit above
 
 
 
