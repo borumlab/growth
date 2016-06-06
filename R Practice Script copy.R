@@ -17,7 +17,7 @@ WHO.References <- read.csv('WHO References.txt', header=TRUE, sep="\t", na.strin
 
 #Calculating Age to use in equations, will probably have to change where Birthdate will be located, going to be in Demographics
 i=1:dim(Anthropometrics)[1]
-Bday <- as.Date(Anthropometrics$Birthdate[1], format= "%m/%d/%Y") #First convert classes from factor to date
+Bday <- as.Date(Demographics.Identified$Birth.Date, format= "%m/%d/%Y") #First convert classes from factor to date
 Date <- as.Date(Anthropometrics$DATE[i], format = "%m/%d/%Y")
 x <- Date - Bday
 y <- as.numeric(x, units = "days")
@@ -272,7 +272,7 @@ NHANES_WT_HT_PCTL <- (pnorm(NHANES_WT_HT_Z))*100
 
 #same SEX as NHANES, need to calculate Age in months
 i=1:dim(Anthropometrics)[1]
-Bday <- as.Date(Anthropometrics$Birthdate[1], format= "%m/%d/%Y") #First convert classes from factor to date
+Bday <- Demographics.Identified$Birth.Date, format= "%m/%d/%Y") #First convert classes from factor to date
 Date <- as.Date(Anthropometrics$DATE[i], format = "%m/%d/%Y")
 x <- Date - Bday
 y <- as.numeric(x, units = "days")
