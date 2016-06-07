@@ -19,11 +19,12 @@ WHO.References <- read.csv('WHO References.txt', header=TRUE, sep="\t", na.strin
 i=1:dim(Anthropometrics)[1]
 Bday <- as.Date(Demographics.Identified$Birth.Date, format= "%m/%d/%Y") #First convert classes from factor to date
 Date <- as.Date(Anthropometrics$DATE[i], format = "%m/%d/%Y")
-x <- Date - Bday
-y <- as.numeric(x, units = "days")
-AGE <- floor(y/365)
+library(lubridate)
+span <- interval(Bday, Date)
+AGE <- as.period(span)
+AGE <- as.numeric(year(AGE))
 #to remove unwanted variables
-rm(i, Bday, Date, x, y)
+rm(i, Bday, Date)
 
 
 
@@ -272,13 +273,13 @@ NHANES_WT_HT_PCTL <- (pnorm(NHANES_WT_HT_Z))*100
 
 #same SEX as NHANES, need to calculate Age in months
 i=1:dim(Anthropometrics)[1]
-Bday <- Demographics.Identified$Birth.Date, format= "%m/%d/%Y") #First convert classes from factor to date
+Bday <- as.Date(Demographics.Identified$Birth.Date, format= "%m/%d/%Y") #First convert classes from factor to date
 Date <- as.Date(Anthropometrics$DATE[i], format = "%m/%d/%Y")
-x <- Date - Bday
-y <- as.numeric(x, units = "days")
-AGE <- floor((y/365)*12)
+span <- interval(Bday, Date)
+AGE <- as.period(span, "months")
+AGE <- as.numeric(month(AGE))
 #to remove unwanted variables
-rm(i, Bday, Date, x, y)
+rm(i, Bday, Date)
 
 
 #LMS for CDC
