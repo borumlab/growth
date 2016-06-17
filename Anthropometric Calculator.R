@@ -1,4 +1,23 @@
-
+if (!require("rJava")) {
+  install.packages("rJava")
+}
+library(rJava)
+if (!require("XLConnectJars")) {
+  install.packages("XLConnectJars")
+}
+library(XLConnectJars)
+if (!require("XLConnect")) {
+  install.packages("XLConnect")
+}
+library(XLConnect)
+if (!require("xlsxjars")) {
+  install.packages("xlsxjars")
+}
+library(xlsxjars)
+if (!require("xlsx")) {
+  install.packages("xlsx")
+}
+library(xlsx)
 
 #Set variables
 patientfolder<-"G:/Data_D/D18/Clinic/Patient Folders/RaSo00668578" 
@@ -6,13 +25,21 @@ setwd(patientfolder)
 Anthropometrics <- read.csv(file='Anthropometrics.txt', header=TRUE, sep="\t", na.strings=c("","NA"))
 
 #using references tables
-reference <- "G:/Notebooks_E/e1(keto)/Candice Sammons/Anthropometrics_Play"
+reference <- "G:/MySQL Database/Anthropometrics"
 setwd(reference)
 CDC.References <- read.csv('CDC References.txt', header=TRUE, sep="\t", na.strings=c("","NA"))
 NHANES.References <- read.csv('NHANES References.txt', header=TRUE, sep="\t", na.strings=c("","NA"))
 WHO.References <- read.csv('WHO References.txt', header=TRUE, sep="\t", na.strings=c("","NA"))
 
 
+#Demographics, need JAVA in order to upload the excel Demographics
+setwd("G:/MySQL Database/Demographics/")
+DEMOGRAPHICS_SOURCE <- "DEMOGRAPHICS_SOURCE.xlsx"
+DEMOGRAPHICS_SOURCE <- readWorksheetFromFile(DEMOGRAPHICS_SOURCE,sheet=1)
+Demographics.Identified <- DEMOGRAPHICS_SOURCE[which(DEMOGRAPHICS_SOURCE$MEDICAL_RECORD_NUMBER==Anthropometrics$MRNUMBER), ]
+
+#saves in patient's folder
+setwd(patientfolder)
 
 
 #Calculating Age to use in equations, will probably have to change where Birthdate will be located, going to be in Demographics
