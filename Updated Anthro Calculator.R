@@ -28,9 +28,10 @@ if (!require("lubridate")) {
 library(lubridate) 
 
 #Set variables
- directory <- "G:/Data_D/D18/Clinic/Patient Folders/RoAr01456840/Data"
+ directory <- "G:/Data_D/D18/Clinic/Patient Folders/ThSc02185176/Data"
  setwd(directory)
- anthro <- "ROAR_ANTHROPOMETRICS_SOURCE.xlsx"
+ anthro <- "THSC_ANTHROPOMETRICS_SOURCE.xlsx"
+ patient <- "THSC"
  Anthropometrics <- readWorksheetFromFile(anthro,endCol=18,sheet=1)
 
 
@@ -908,9 +909,9 @@ BODY_FAT_PCTG_DAY <- ((WT_DAY-FFM_DAY)/WT_DAY)*100
 
 
 #need to remove the means and standard deviations in order for the new interpolated means and standard deviations to work
-rm(MEAN_NHANES_HT, SD_NHANES_HT, MEAN_NHANES_WT, SD_NHANES_WT, MEAN_NHANES_BMI, SD_NHANES_BMI, MEAN_NHANES_UAC, SD_NHANES_UAC, MEAN_NHANES_TSF, SD_NHANES_TSF, MEAN_NHANES_UAA, SD_NHANES_UAA, MEAN_NHANES_AMA, SD_NHANES_AMA, MEAN_NHANES_AFA, SD_NHANES_AFA, MEAN_NHANES_SSF, SD_NHANES_SSF, MEAN_NHANES_UC, SD_NHANES_UC, MEAN_NHANES_WT_FOR_HT, SD_NHANES_WT_FOR_HT) 
-rm(L_CDC_WT, M_CDC_WT, S_CDC_WT, L_CDC_HT, M_CDC_HT, S_CDC_HT, L_CDC_BMI, M_CDC_BMI, S_CDC_BMI, L_CDC_WT_HT, M_CDC_WT_HT, S_CDC_WT_HT, L_CDC_HC, M_CDC_HC, S_CDC_HC)
-rm(L_WHO_HT, M_WHO_HT, S_WHO_HT, L_WHO_BMI, M_WHO_BMI, S_WHO_BMI, L_WHO_HC, M_WHO_HC, S_WHO_HC, L_WHO_SSF, M_WHO_SSF, S_WHO_SSF, L_WHO_TSF, M_WHO_TSF, S_WHO_TSF, L_WHO_UAC, M_WHO_UAC, S_WHO_UAC, L_WHO_WT, M_WHO_WT, S_WHO_WT, L_WHO_WT_HT, M_WHO_WT_HT, S_WHO_WT_HT) 
+#rm(MEAN_NHANES_HT, SD_NHANES_HT, MEAN_NHANES_WT, SD_NHANES_WT, MEAN_NHANES_BMI, SD_NHANES_BMI, MEAN_NHANES_UAC, SD_NHANES_UAC, MEAN_NHANES_TSF, SD_NHANES_TSF, MEAN_NHANES_UAA, SD_NHANES_UAA, MEAN_NHANES_AMA, SD_NHANES_AMA, MEAN_NHANES_AFA, SD_NHANES_AFA, MEAN_NHANES_SSF, SD_NHANES_SSF, MEAN_NHANES_UC, SD_NHANES_UC, MEAN_NHANES_WT_FOR_HT, SD_NHANES_WT_FOR_HT) 
+#rm(L_CDC_WT, M_CDC_WT, S_CDC_WT, L_CDC_HT, M_CDC_HT, S_CDC_HT, L_CDC_BMI, M_CDC_BMI, S_CDC_BMI, L_CDC_WT_HT, M_CDC_WT_HT, S_CDC_WT_HT, L_CDC_HC, M_CDC_HC, S_CDC_HC)
+#rm(L_WHO_HT, M_WHO_HT, S_WHO_HT, L_WHO_BMI, M_WHO_BMI, S_WHO_BMI, L_WHO_HC, M_WHO_HC, S_WHO_HC, L_WHO_SSF, M_WHO_SSF, S_WHO_SSF, L_WHO_TSF, M_WHO_TSF, S_WHO_TSF, L_WHO_UAC, M_WHO_UAC, S_WHO_UAC, L_WHO_WT, M_WHO_WT, S_WHO_WT, L_WHO_WT_HT, M_WHO_WT_HT, S_WHO_WT_HT) 
 
 
 #Race for NHANES
@@ -1423,7 +1424,13 @@ interpolatedtable <- cbind.data.frame(DATE, HT_DAY, WT_DAY, HC_DAY, UAC_DAY, TSF
 finaltable <- merge(anthrotable, interpolatedtable, by=c('DATE'), all.x=TRUE, all.y=TRUE)
 finaltable$SOURCE[which(is.na(finaltable$SOURCE))] <- 4
 finaltable$DAY_TYPE <- c(NA, finaltable$DAY_TYPE[!is.na(finaltable$DAY_TYPE)])[cumsum(!is.na(finaltable$DAY_TYPE)) + 1]
+z <- dim(finaltable)[1]
 finaltable$MRNUMBER <- rep.int(finaltable$MRNUMBER[1], z)
+finaltable <- finaltable[ , c(2, 1, 3:ncol(finaltable)) ]
 
-finaltable[is.na(finaltable)] <- " "
-write.csv(x=finaltable, row.names= FALSE, file = "Practice.csv")
+#line 1432 sometimes works and sometimes doesn't, need to check this
+#finaltable <- as.data.frame.numeric(finaltable)
+#finaltable[is.na(finaltable)] <- " "
+xlsx <- "ANTHROPOMETRICS_CLINICAL.xlsx"
+xlsx <- gsub(" ","", paste(patient,"_", xlsx))
+write.xlsx2(finaltable,file=xlsx,row.names=FALSE, showNA=FALSE)
