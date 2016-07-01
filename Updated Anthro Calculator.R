@@ -1,3 +1,6 @@
+#If run into JAVA out of memory problem, start over and include line below (need to ask Johnathan)
+#actually doesn't look like it really works
+#options(java.parameters = "-Xmx8000m")
 if (!require("rJava")) { 
   install.packages("rJava") 
 } 
@@ -28,10 +31,10 @@ if (!require("lubridate")) {
 library(lubridate) 
 
 #Set variables
- directory <- "G:/Data_D/D18/Clinic/Patient Folders/ThSc02185176/Data"
+ directory <- "G:/Data_D/D18/Clinic/Patient Folders/RoAr01456840/Data"
  setwd(directory)
- anthro <- "THSC_ANTHROPOMETRICS_SOURCE.xlsx"
- patient <- "THSC"
+ anthro <- "JEKI_ANTHROPOMETRICS_SOURCE.xlsx"
+ patient <- "JEKI"
  Anthropometrics <- readWorksheetFromFile(anthro,endCol=18,sheet=1)
 
 
@@ -577,7 +580,7 @@ prodate <- Demographics.Identified$PKT_PROSPECTIVE_DATE
 naive <- ifelse(Demographics.Identified$STRATA[1] == "N", TRUE, FALSE)
 
 
-{
+
 if (naive == TRUE) {
   sub <- anthro[anthro$SOURCE!=1,]
   anthro <- anthro[!(as.numeric(rownames(anthro)) %in% as.numeric(rownames(sub))),]
@@ -591,7 +594,7 @@ if (naive == TRUE) {
 y1 <- as.Date(anthro$DATE[1], format="%m/%d/%Y")
 y2 <- as.Date(anthro$DATE[length(anthro[,1])], format="%m/%d/%Y")
 DATE <- seq(y1, y2, by="days")
-}
+
 
 #HT
 table <- anthro[complete.cases(anthro$HT),]
@@ -811,20 +814,82 @@ X_DAY <- c(table$X[1], X_DAY)
 
 rm(y,i,x1,x2,diffx, Date1, Date2, x, difftotal, y1, y2, diffheight, difftotal1, HT)
 
-#make same length so can put it in table together
+#for length of interpolated data so it can fit in the anthro_interpolation table
 z <- length(DATE)
+a <- which(!is.na(anthro$HT))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+HT_DAY <- c(rep(NA, c-1), HT_DAY)
 length(HT_DAY) <- z
+
+
+a <- which(!is.na(anthro$WT))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+WT_DAY <- c(rep(NA, c-1), WT_DAY)
 length(WT_DAY) <- z
+
+a <- which(!is.na(anthro$HC))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+HC_DAY <- c(rep(NA, c-1), HC_DAY)
 length(HC_DAY) <- z
+
+a <- which(!is.na(anthro$UAC))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+UAC_DAY <- c(rep(NA, c-1), UAC_DAY)
 length(UAC_DAY) <- z
+
+a <- which(!is.na(anthro$TSF))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+TSF_DAY <- c(rep(NA, c-1), TSF_DAY)
 length(TSF_DAY) <- z
+
+a <- which(!is.na(anthro$SSF))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+SSF_DAY <- c(rep(NA, c-1), SSF_DAY)
 length(SSF_DAY) <- z
+
+a <- which(!is.na(anthro$USF))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+USF_DAY <- c(rep(NA, c-1), USF_DAY)
 length(USF_DAY) <- z
+
+a <- which(!is.na(anthro$SISF))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+SISF_DAY <- c(rep(NA, c-1), SISF_DAY)
 length(SISF_DAY) <- z
+
+a <- which(!is.na(anthro$MBSF))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+MBSF_DAY <- c(rep(NA, c-1), MBSF_DAY)
 length(MBSF_DAY) <- z
+
+
+a <- which(!is.na(anthro$UC))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+UC_DAY <- c(rep(NA, c-1), UC_DAY)
 length(UC_DAY) <- z
+
+a <- which(!is.na(anthro$R))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+R_DAY <- c(rep(NA, c-1), R_DAY)
 length(R_DAY) <- z
+
+a <- which(!is.na(anthro$X))[1]
+b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+c <- which(DATE==b)
+X_DAY <- c(rep(NA, c-1), X_DAY)
 length(X_DAY) <- z
+
 
 MRNUMBER <- cbind(rep(unique(anthro$MRNUMBER),z))
 
@@ -1333,87 +1398,6 @@ WHO_WT_HT_PCTL_DAY <- (pnorm(WHO_WT_HT_Z_DAY))*100
 GC_DAY <- (NHANES_UC_Z_DAY* VC_PCTG_DAY)/100
 
 
-#below is to make the length from Anthropometrics match the interpolated values so we can put them on the same table
-#length(DAY_TYPE) <- z
-#length(SOURCE) <- z
-#HT <- Anthropometrics$HT
-#length(HT) <- z
-#length(WT) <- z
-#length(HC) <- z
-#length(UAC) <- z
-#length(TSF) <-z
-#length(SSF) <- z
-#length(USF) <- z
-#length(SISF) <- z
-#length(MBSF) <- z
-#length(UC) <- z
-#length(R) <- z
-#length(X) <-z
-#length(CDC_HT_PCTL) <- z
-#length(CDC_HT_Z) <- z
-#length(WHO_HT_PCTL) <- z
-#length(WHO_HT_Z) <- z
-#length(NHANES_HT_PCTL) <- z
-#length(NHANES_HT_Z) <- z
-#length(CDC_WT_PCTL) <- z
-#length(CDC_WT_Z) <- z
-#length(WHO_WT_PCTL) <- z
-#length(WHO_WT_Z) <- z
-#length(NHANES_WT_PCTL) <- z
-#length(NHANES_WT_Z) <- z
-#length(BMI) <- z
-#length(CDC_BMI_PCTL) <- z
-#length(CDC_BMI_Z) <- z
-#length(WHO_BMI_PCTL) <- z
-#length(WHO_BMI_Z) <- z
-#length(NHANES_BMI_PCTL) <- z
-#length(NHANES_BMI_Z) <- z
-#length(CDC_WT_HT_PCTL) <- z
-#length(CDC_WT_HT_Z) <- z
-#length(WHO_WT_HT_PCTL) <- z
-#length(WHO_WT_HT_Z) <- z
-#length(NHANES_WT_HT_PCTL) <- z
-#length(NHANES_WT_HT_Z) <- z
-#length(CDC_HC_PCTL) <- z
-#length(CDC_HC_Z) <- z
-#length(WHO_HC_PCTL) <- z
-#length(WHO_HC_Z) <- z
-#length(WHO_UAC_PCTL) <- z
-#length(WHO_UAC_Z) <- z
-#length(NHANES_UAC_PCTL) <- z
-#length(NHANES_UAC_Z) <- z
-#length(WHO_TSF_PCTL) <- z
-#length(WHO_TSF_Z) <- z
-#length(NHANES_TSF_PCTL) <- z
-#length(NHANES_TSF_Z) <- z
-#length(UAA) <- z
-#length(NHANES_UAA_PCTL) <- z
-#length(NHANES_UAA_Z) <- z
-#length(AMC) <- z
-#length(AMA) <- z
-#length(NHANES_AMA_PCTL) <- z
-#length(NHANES_AMA_Z) <- z
-#length(AFA) <- z
-#length(NHANES_AFA_PCTL) <- z
-#length(NHANES_AFA_Z) <- z
-#length(WHO_SSF_PCTL) <- z
-#length(WHO_SSF_Z) <- z
-#length(NHANES_SSF_PCTL) <- z
-#length(NHANES_SSF_Z) <- z
-#length(NHANES_UC_PCTL) <- z
-#length(NHANES_UC_Z) <- z
-#length(VCA) <- z
-#length(VC_PCTG) <- z
-#length(GC) <- z
-#length(Z) <- z
-#length(P) <- z
-#length(ARPADI_FFM) <- z
-#length(GORAN_FFM) <- z
-#length(ARPADI_TBW) <- z
-#length(SCHAEFER_FFM) <- z
-#length(KOTLER_FFM) <- z
-#length(BODY_FAT_PCTG) <- z
-
 
 #for day type drag the number in the previous date to the next date
 #for source use number '4' to indicate interpolated date
@@ -1428,7 +1412,6 @@ z <- dim(finaltable)[1]
 finaltable$MRNUMBER <- rep.int(finaltable$MRNUMBER[1], z)
 finaltable <- finaltable[ , c(2, 1, 3:ncol(finaltable)) ]
 
-#line 1432 sometimes works and sometimes doesn't, need to check this
 #finaltable <- as.data.frame.numeric(finaltable)
 #finaltable[is.na(finaltable)] <- " "
 xlsx <- "ANTHROPOMETRICS_CLINICAL.xlsx"
