@@ -31,10 +31,10 @@ if (!require("lubridate")) {
 library(lubridate) 
 
 #Set variables
- directory <- "G:/Data_D/D18/Clinic/Patient Folders/RoAr01456840/Data"
+ directory <- "G:/Data_D/D18/Clinic/Patient Folders/ThSc02185176/Data"
  setwd(directory)
- anthro <- "JEKI_ANTHROPOMETRICS_SOURCE.xlsx"
- patient <- "JEKI"
+ anthro <- "THSC_ANTHROPOMETRICS_SOURCE.xlsx"
+ patient <- "THSC"
  Anthropometrics <- readWorksheetFromFile(anthro,endCol=18,sheet=1)
 
 
@@ -1407,7 +1407,33 @@ GC_DAY <- (NHANES_UC_Z_DAY* VC_PCTG_DAY)/100
 interpolatedtable <- cbind.data.frame(DATE, HT_DAY, WT_DAY, HC_DAY, UAC_DAY, TSF_DAY, SSF_DAY, USF_DAY, SISF_DAY, MBSF_DAY, UC_DAY, R_DAY, X_DAY, CDC_HT_PCTL_DAY, CDC_HT_Z_DAY, WHO_HT_PCTL_DAY, WHO_HT_Z_DAY, NHANES_HT_PCTL_DAY, NHANES_HT_Z_DAY, CDC_WT_PCTL_DAY, CDC_WT_Z_DAY, WHO_WT_PCTL_DAY, WHO_WT_Z_DAY, NHANES_WT_PCTL_DAY, NHANES_WT_Z_DAY, BMI_DAY, CDC_BMI_PCTL_DAY, CDC_BMI_Z_DAY, WHO_BMI_PCTL_DAY, WHO_BMI_Z_DAY, NHANES_BMI_PCTL_DAY, NHANES_BMI_Z_DAY, CDC_WT_HT_PCTL_DAY, CDC_WT_HT_Z_DAY, WHO_WT_HT_PCTL_DAY, WHO_WT_HT_Z_DAY, NHANES_WT_HT_PCTL_DAY, NHANES_WT_HT_Z_DAY, CDC_HC_PCTL_DAY, CDC_HC_Z_DAY, WHO_HC_PCTL_DAY, WHO_HC_Z_DAY, WHO_UAC_PCTL_DAY, WHO_UAC_Z_DAY, NHANES_UAC_PCTL_DAY, NHANES_UAC_Z_DAY, WHO_TSF_PCTL_DAY, WHO_TSF_Z_DAY, NHANES_TSF_PCTL_DAY, NHANES_TSF_Z_DAY, UAA_DAY, NHANES_UAA_PCTL_DAY, NHANES_UAA_Z_DAY, AMC_DAY, AMA_DAY, NHANES_AMA_PCTL_DAY, NHANES_AMA_Z_DAY, AFA_DAY, NHANES_AFA_PCTL_DAY, NHANES_AFA_Z_DAY, WHO_SSF_PCTL_DAY, WHO_SSF_Z_DAY, NHANES_SSF_PCTL_DAY, NHANES_SSF_Z_DAY, NHANES_UC_PCTL_DAY, NHANES_UC_Z_DAY, VCA_DAY, VC_PCTG_DAY, GC_DAY, Z_DAY, P_DAY, ARPADI_FFM_DAY, GORAN_FFM_DAY, ARPADI_TBW_DAY, SCHAEFER_FFM_DAY, KOTLER_FFM_DAY, BODY_FAT_PCTG_DAY)
 finaltable <- merge(anthrotable, interpolatedtable, by=c('DATE'), all.x=TRUE, all.y=TRUE)
 finaltable$SOURCE[which(is.na(finaltable$SOURCE))] <- 4
-finaltable$DAY_TYPE <- c(NA, finaltable$DAY_TYPE[!is.na(finaltable$DAY_TYPE)])[cumsum(!is.na(finaltable$DAY_TYPE)) + 1]
+#finaltable$DAY_TYPE <- c(NA, finaltable$DAY_TYPE[!is.na(finaltable$DAY_TYPE)])[cumsum(!is.na(finaltable$DAY_TYPE)) + 1]
+
+day1 <- as.Date(Demographics.Identified$PKT_INITIATED_DATE)
+lastday <- as.Date(Demographics.Identified$PKT_STOPPED_DATE)
+
+#before first day
+sub1 <- finaltable$DATE < day1
+a <- finaltable$DAY_TYPE[sub1]
+finaltable$DAY_TYPE[sub1] <- ifelse(is.na(a), 3, a)
+a <- ifelse(is.na(a), 3, a)
+finaltable$DAY_TYPE[sub1] <- ifelse(a!=1 & a!=4, 3, a)
+
+#next
+sub2 <- finaltable$DATE >= day1
+b <- finaltable$DAY_TYPE[sub2]
+finaltable$DAY_TYPE[sub2] <- ifelse(is.na(b), 2, b)
+b <- ifelse(is.na(b), 2, b)
+finaltable$DAY_TYPE[sub2] <- ifelse(b!=1 & b!=4, 2, b)
+
+if (is.na(lastday)) {
+  c <- 'NA'
+} else if (!(is.na(lastday))) {
+  sub3 <- finaltable$DATE > lastday
+  c <- finaltable$DAY_TYPE[sub3]
+  finaltable$DAY_TYPE[sub3] <- 3
+}
+
 z <- dim(finaltable)[1]
 finaltable$MRNUMBER <- rep.int(finaltable$MRNUMBER[1], z)
 finaltable <- finaltable[ , c(2, 1, 3:ncol(finaltable)) ]
