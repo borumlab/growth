@@ -1,6 +1,6 @@
-#If run into JAVA out of memory problem, start over and include line below (need to ask Johnathan)
-#actually doesn't look like it really works
-#options(java.parameters = "-Xmx8000m")
+
+options(java.parameters = "-Xmx1000m")
+#options( java.parameters = "-Xmx4g" )
 if (!require("rJava")) { 
   install.packages("rJava") 
 } 
@@ -13,14 +13,14 @@ if (!require("xlsx")) {
   install.packages("xlsx") 
 } 
 library(xlsx) 
-if (!require("XLConnectJars")) { 
-  install.packages("XLConnectJars") 
-} 
-library(XLConnectJars) 
-if (!require("XLConnect")) { 
-  install.packages("XLConnect") 
-} 
-library(XLConnect) 
+#if (!require("XLConnectJars")) { 
+#  install.packages("XLConnectJars") 
+#} 
+#library(XLConnectJars) 
+#if (!require("XLConnect")) { 
+#  install.packages("XLConnect") 
+#} 
+#library(XLConnect) 
 if (!require("openxlsx")) { 
   install.packages("openxlsx") 
 } 
@@ -31,11 +31,12 @@ if (!require("lubridate")) {
 library(lubridate) 
 
 #Set variables
- directory <- "G:/Data_D/D18/Clinic/Patient Folders/ThSc02185176/Data"
+ directory <- "G:/Data_D/D18/Clinic/Patient Folders/HeDa01589550/Data"
  setwd(directory)
- anthro <- "THSC_ANTHROPOMETRICS_SOURCE.xlsx"
- patient <- "THSC"
- Anthropometrics <- readWorksheetFromFile(anthro,endCol=18,sheet=1)
+ anthro <- "HEDA_ANTHROPOMETRICS_SOURCE.xlsx"
+ patient <- "HEDA"
+ #Anthropometrics <- readWorksheetFromFile(anthro,endCol=18,sheet=1)
+ Anthropometrics <- read.xlsx(anthro,sheet=1, detectDates = TRUE)
 
 
 #using references tables
@@ -49,7 +50,8 @@ WHO.References <- read.csv('WHO References.txt', header=TRUE, sep="\t", na.strin
 #Demographics, need JAVA in order to upload the excel Demographics
 setwd("G:/MySQL Database/Demographics/")
 DEMOGRAPHICS_SOURCE <- "DEMOGRAPHICS_SOURCE.xlsx"
-DEMOGRAPHICS_SOURCE <- readWorksheetFromFile(DEMOGRAPHICS_SOURCE,sheet=1)
+#DEMOGRAPHICS_SOURCE <- readWorksheetFromFile(DEMOGRAPHICS_SOURCE,sheet=1)
+DEMOGRAPHICS_SOURCE <- read.xlsx(DEMOGRAPHICS_SOURCE,sheet=1, detectDates = TRUE)
 Demographics.Identified <- DEMOGRAPHICS_SOURCE[which(DEMOGRAPHICS_SOURCE$MRNUMBER==Anthropometrics$MRNUMBER), ]
 
 #saves in patient's folder
@@ -564,8 +566,10 @@ MBSF <- Anthropometrics$MBSF
 UC <- Anthropometrics$UC
 R <- Anthropometrics$R
 X <- Anthropometrics$X
+CP_DAY <- Anthropometrics$CP
+PA_DAY <- Anthropometrics$PA
 
-anthrotable <- cbind.data.frame(MRNUMBER, DATE, DAY_TYPE, SOURCE, HT, WT, HC, UAC, TSF, SSF, USF, SISF, MBSF, UC, R, X, CDC_HT_PCTL, CDC_HT_Z, WHO_HT_PCTL, WHO_HT_Z, NHANES_HT_PCTL, NHANES_HT_Z, CDC_WT_PCTL, CDC_WT_Z, WHO_WT_PCTL, WHO_WT_Z, NHANES_WT_PCTL, NHANES_WT_Z, BMI,  CDC_BMI_PCTL, CDC_BMI_Z, WHO_BMI_PCTL, WHO_BMI_Z, NHANES_BMI_PCTL, NHANES_BMI_Z, CDC_WT_HT_PCTL, CDC_WT_HT_Z, WHO_WT_HT_PCTL, WHO_WT_HT_Z, NHANES_WT_HT_PCTL, NHANES_WT_HT_Z, CDC_HC_PCTL, CDC_HC_Z, WHO_HC_PCTL, WHO_HC_Z, WHO_UAC_PCTL, WHO_UAC_Z, NHANES_UAC_PCTL, NHANES_UAC_Z, WHO_TSF_PCTL, WHO_TSF_Z, NHANES_TSF_PCTL, NHANES_TSF_Z, UAA, NHANES_UAA_PCTL, NHANES_UAA_Z, AMC, AMA, NHANES_AMA_PCTL, NHANES_AMA_Z, AFA, NHANES_AFA_PCTL, NHANES_AFA_Z, WHO_SSF_PCTL, WHO_SSF_Z, NHANES_SSF_PCTL, NHANES_SSF_Z, NHANES_UC_PCTL, NHANES_UC_Z, VCA, VC_PCTG, GC, Z, P, ARPADI_FFM, GORAN_FFM, SCHAEFER_FFM, KOTLER_FFM, BODY_FAT_PCTG)
+anthrotable <- cbind.data.frame(MRNUMBER, DATE, DAY_TYPE, SOURCE, HT, WT, HC, UAC, TSF, SSF, USF, SISF, MBSF, UC, R, X, CDC_HT_PCTL, CDC_HT_Z, WHO_HT_PCTL, WHO_HT_Z, NHANES_HT_PCTL, NHANES_HT_Z, CDC_WT_PCTL, CDC_WT_Z, WHO_WT_PCTL, WHO_WT_Z, NHANES_WT_PCTL, NHANES_WT_Z, BMI,  CDC_BMI_PCTL, CDC_BMI_Z, WHO_BMI_PCTL, WHO_BMI_Z, NHANES_BMI_PCTL, NHANES_BMI_Z, CDC_WT_HT_PCTL, CDC_WT_HT_Z, WHO_WT_HT_PCTL, WHO_WT_HT_Z, NHANES_WT_HT_PCTL, NHANES_WT_HT_Z, CDC_HC_PCTL, CDC_HC_Z, WHO_HC_PCTL, WHO_HC_Z, WHO_UAC_PCTL, WHO_UAC_Z, NHANES_UAC_PCTL, NHANES_UAC_Z, WHO_TSF_PCTL, WHO_TSF_Z, NHANES_TSF_PCTL, NHANES_TSF_Z, UAA, NHANES_UAA_PCTL, NHANES_UAA_Z, AMC, AMA, NHANES_AMA_PCTL, NHANES_AMA_Z, AFA, NHANES_AFA_PCTL, NHANES_AFA_Z, WHO_SSF_PCTL, WHO_SSF_Z, NHANES_SSF_PCTL, NHANES_SSF_Z, NHANES_UC_PCTL, NHANES_UC_Z, VCA, VC_PCTG, GC, Z, P, ARPADI_FFM, GORAN_FFM, SCHAEFER_FFM, KOTLER_FFM, BODY_FAT_PCTG, CP_DAY, PA_DAY)
 #finaltable[is.na(finaltable)] <- " "
 #above replaces NAs with blanks
 #write.csv(x=finaltable, row.names= FALSE, file = "PracticeBeKe2.csv")
@@ -1443,3 +1447,5 @@ finaltable <- finaltable[ , c(2, 1, 3:ncol(finaltable)) ]
 xlsx <- "ANTHROPOMETRICS_CLINICAL.xlsx"
 xlsx <- gsub(" ","", paste(patient,"_", xlsx))
 write.xlsx2(finaltable,file=xlsx,row.names=FALSE, showNA=FALSE)
+
+rm(list=ls())
