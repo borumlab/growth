@@ -31,10 +31,10 @@ if (!require("lubridate")) {
 library(lubridate) 
 
 #Set variables
- directory <- "G:/Data_D/D18/Clinic/Patient Folders/HeDa01589550/Data"
+ directory <- "G:/Data_D/D18/Clinic/Patient Folders/RoAr01456840/Data"
  setwd(directory)
- anthro <- "HEDA_ANTHROPOMETRICS_SOURCE.xlsx"
- patient <- "HEDA"
+ anthro <- "ROAR_ANTHROPOMETRICS_SOURCE.xlsx"
+ patient <- "ROAR"
  #Anthropometrics <- readWorksheetFromFile(anthro,endCol=18,sheet=1)
  Anthropometrics <- read.xlsx(anthro,sheet=1, detectDates = TRUE)
 
@@ -1438,6 +1438,38 @@ if (is.na(lastday)) {
   finaltable$DAY_TYPE[sub3] <- 3
 }
 
+#for CP and PA
+#CP
+finaltable$CP_DAY <- c(NA, finaltable$CP_DAY[!is.na(finaltable$CP_DAY)])[cumsum(!is.na(finaltable$CP_DAY)) + 1]
+#PA
+Bday <- as.Date(Demographics.Identified$DOB, format= "%m/%d/%Y") #First convert classes from factor to date
+span <- interval(Bday, finaltable$DATE)
+AGE_DAY <- as.period(span)
+AGE_DAY <- as.numeric(year(AGE_DAY))
+#to remove unwanted variables
+rm(Bday, span)
+
+sub <- AGE_DAY < 3
+finaltable$PA_DAY[sub] <- NA
+a <- which(!is.na(finaltable$PA_DAY))[1]
+b <- finaltable$PA_DAY[a]
+sub2 <- AGE_DAY > 2
+sub2 <- sub2[1:a-1]
+finaltable$PA_DAY[1:a-1] <- ifelse(sub2==TRUE, b, finaltable$PA_DAY)
+
+#table$`finaltable$PA_DAY`[1:a-1]
+
+#!is.na(table$`finaltable$PA_DAY`) & AGE_DAY > 18
+c <- which((!is.na(finaltable$PA_DAY) & AGE_DAY > 18)==TRUE)[1]
+d <- finaltable$PA_DAY[c]
+sub3 <- AGE_DAY > 18
+sub3 <- sub3[1:c-1]
+finaltable$PA_DAY[1:c-1] <- ifelse(sub3==TRUE, d, finaltable$PA_DAY)
+
+finaltable$PA_DAY <- c(NA, finaltable$PA_DAY[!is.na(finaltable$PA_DAY)])[cumsum(!is.na(finaltable$PA_DAY)) + 1]
+
+
+#final product
 z <- dim(finaltable)[1]
 finaltable$MRNUMBER <- rep.int(finaltable$MRNUMBER[1], z)
 finaltable <- finaltable[ , c(2, 1, 3:ncol(finaltable)) ]
@@ -1448,4 +1480,5 @@ xlsx <- "ANTHROPOMETRICS_CLINICAL.xlsx"
 xlsx <- gsub(" ","", paste(patient,"_", xlsx))
 write.xlsx2(finaltable,file=xlsx,row.names=FALSE, showNA=FALSE)
 
+#use rm below to clean working directory so that you can automatically go to next patient?
 rm(list=ls())
