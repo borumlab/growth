@@ -31,10 +31,10 @@ if (!require("lubridate")) {
 library(lubridate) 
 
 #Set variables
- directory <- "G:/Data_D/D18/Clinic/Patient Folders/RoAr01456840/Data"
+ directory <- "G:/Data_D/D18/Clinic/Patient Folders/RaSo00668578/Data"
  setwd(directory)
- anthro <- "ROAR_ANTHROPOMETRICS_SOURCE.xlsx"
- patient <- "ROAR"
+ anthro <- "RASO_ANTHROPOMETRICS_SOURCE.xlsx"
+ patient <- "RASO"
  #Anthropometrics <- readWorksheetFromFile(anthro,endCol=18,sheet=1)
  Anthropometrics <- read.xlsx(anthro,sheet=1, detectDates = TRUE)
 
