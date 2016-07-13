@@ -1,43 +1,47 @@
 
-options(java.parameters = "-Xmx1000m")
-#options( java.parameters = "-Xmx4g" )
-if (!require("rJava")) { 
-  install.packages("rJava") 
-} 
-library(rJava) 
-if (!require("xlsxjars")) { 
-  install.packages("xlsxjars") 
-} 
-library(xlsxjars) 
-if (!require("xlsx")) { 
-  install.packages("xlsx") 
-} 
-library(xlsx) 
-#if (!require("XLConnectJars")) { 
-#  install.packages("XLConnectJars") 
-#} 
-#library(XLConnectJars) 
-#if (!require("XLConnect")) { 
-#  install.packages("XLConnect") 
-#} 
-#library(XLConnect) 
-if (!require("openxlsx")) { 
-  install.packages("openxlsx") 
-} 
-library(openxlsx)
-if (!require("lubridate")) { 
-  install.packages("lubridate") 
-} 
-library(lubridate) 
-
-#Set variables
- directory <- "G:/Data_D/D18/Clinic/Patient Folders/RaSo00668578/Data"
- setwd(directory)
- anthro <- "RASO_ANTHROPOMETRICS_SOURCE.xlsx"
- patient <- "RASO"
- #Anthropometrics <- readWorksheetFromFile(anthro,endCol=18,sheet=1)
- Anthropometrics <- read.xlsx(anthro,sheet=1, detectDates = TRUE)
-
+anthro <- function() {
+  
+  options(java.parameters = "-Xmx1000m")
+  
+  if (!require("rJava")) { 
+    install.packages("rJava") 
+  } 
+  library(rJava) 
+  if (!require("xlsxjars")) { 
+    install.packages("xlsxjars") 
+  } 
+  library(xlsxjars) 
+  if (!require("xlsx")) { 
+    install.packages("xlsx") 
+  } 
+  library(xlsx) 
+  
+  if (!require("openxlsx")) { 
+    install.packages("openxlsx") 
+  } 
+  library(openxlsx)
+  if (!require("lubridate")) { 
+    install.packages("lubridate") 
+  } 
+  library(lubridate) 
+  
+  
+  print("Input the four letters that signify the patient we are doing calculations for") 
+  print("Example: FILA") 
+  patient <<- readline(prompt="Enter here: ") 
+  
+  
+  print("Input the directory that you wish to draw this patient's ANTHROPOMETRICS file from") 
+  print("Example: C:/Folder_Name/") 
+  directory <<- readline(prompt="Enter here: ") 
+  setwd(directory) 
+  
+  data <- "ANTHROPOMETRICS_SOURCE.xlsx" 
+  data <- gsub(" ","",paste(patient,"_",data)) 
+  Anthropometrics <<- read.xlsx(data,sheet=1,detectDates=TRUE) 
+  
+  
+}
 
 #using references tables
 reference <- "G:/MySQL Database/Anthropometrics"
