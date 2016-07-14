@@ -43,6 +43,8 @@ anthro <- function() {
   
 }
 
+############################################################################
+
 #using references tables
 reference <- "G:/MySQL Database/Anthropometrics"
 setwd(reference)
@@ -51,10 +53,8 @@ NHANES.References <- read.csv('NHANES References.txt', header=TRUE, sep="\t", na
 WHO.References <- read.csv('WHO References.txt', header=TRUE, sep="\t", na.strings=c("","NA"))
 
 
-#Demographics, need JAVA in order to upload the excel Demographics
 setwd("G:/MySQL Database/Demographics/")
 DEMOGRAPHICS_SOURCE <- "DEMOGRAPHICS_SOURCE.xlsx"
-#DEMOGRAPHICS_SOURCE <- readWorksheetFromFile(DEMOGRAPHICS_SOURCE,sheet=1)
 DEMOGRAPHICS_SOURCE <- read.xlsx(DEMOGRAPHICS_SOURCE,sheet=1, detectDates = TRUE)
 Demographics.Identified <- DEMOGRAPHICS_SOURCE[which(DEMOGRAPHICS_SOURCE$MRNUMBER==Anthropometrics$MRNUMBER), ]
 
@@ -318,8 +318,7 @@ NHANES_WT_HT_PCTL <- (pnorm(NHANES_WT_HT_Z))*100
 #table3 <- cbind(NHANES_HT_PCTL, NHANES_HT_Z, NHANES_WT_PCTL, NHANES_WT_Z, NHANES_BMI_PCTL, NHANES_BMI_Z, NHANES_UAC_PCTL, NHANES_UAC_Z, NHANES_TSF_PCTL, NHANES_TSF_Z, NHANES_UAA_PCTL, NHANES_UAA_Z, NHANES_AMA_PCTL, NHANES_AMA_Z, NHANES_AFA_PCTL, NHANES_AFA_Z, NHANES_SSF_PCTL, NHANES_SSF_Z, NHANES_UC_PCTL, NHANES_UC_Z, NHANES_WT_HT_Z, NHANES_WT_HT_PCTL)
 
 
-#CDC R script
-#yearfrac from EXCEL
+#CDC
 #same SEX as NHANES, need to calculate Age in months
 i=1:dim(Anthropometrics)[1]
 Bday <- as.Date(Demographics.Identified$DOB[1], format= "%m/%d/%Y") #First convert classes from factor to date
@@ -574,11 +573,6 @@ CP_DAY <- Anthropometrics$CP
 PA_DAY <- Anthropometrics$PA
 
 anthrotable <- cbind.data.frame(MRNUMBER, DATE, DAY_TYPE, SOURCE, HT, WT, HC, UAC, TSF, SSF, USF, SISF, MBSF, UC, R, X, CDC_HT_PCTL, CDC_HT_Z, WHO_HT_PCTL, WHO_HT_Z, NHANES_HT_PCTL, NHANES_HT_Z, CDC_WT_PCTL, CDC_WT_Z, WHO_WT_PCTL, WHO_WT_Z, NHANES_WT_PCTL, NHANES_WT_Z, BMI,  CDC_BMI_PCTL, CDC_BMI_Z, WHO_BMI_PCTL, WHO_BMI_Z, NHANES_BMI_PCTL, NHANES_BMI_Z, CDC_WT_HT_PCTL, CDC_WT_HT_Z, WHO_WT_HT_PCTL, WHO_WT_HT_Z, NHANES_WT_HT_PCTL, NHANES_WT_HT_Z, CDC_HC_PCTL, CDC_HC_Z, WHO_HC_PCTL, WHO_HC_Z, WHO_UAC_PCTL, WHO_UAC_Z, NHANES_UAC_PCTL, NHANES_UAC_Z, WHO_TSF_PCTL, WHO_TSF_Z, NHANES_TSF_PCTL, NHANES_TSF_Z, UAA, NHANES_UAA_PCTL, NHANES_UAA_Z, AMC, AMA, NHANES_AMA_PCTL, NHANES_AMA_Z, AFA, NHANES_AFA_PCTL, NHANES_AFA_Z, WHO_SSF_PCTL, WHO_SSF_Z, NHANES_SSF_PCTL, NHANES_SSF_Z, NHANES_UC_PCTL, NHANES_UC_Z, VCA, VC_PCTG, GC, Z, P, ARPADI_FFM, GORAN_FFM, SCHAEFER_FFM, KOTLER_FFM, BODY_FAT_PCTG, CP_DAY, PA_DAY)
-#finaltable[is.na(finaltable)] <- " "
-#above replaces NAs with blanks
-#write.csv(x=finaltable, row.names= FALSE, file = "PracticeBeKe2.csv")
-
-
 
 
 #Interpolation
@@ -586,7 +580,6 @@ anthro <- Anthropometrics
 demo <- Demographics.Identified
 prodate <- Demographics.Identified$PKT_PROSPECTIVE_DATE
 naive <- ifelse(Demographics.Identified$STRATA[1] == "N", TRUE, FALSE)
-
 
 
 if (naive == TRUE) {
@@ -981,11 +974,6 @@ BODY_FAT_PCTG_DAY <- ((WT_DAY-FFM_DAY)/WT_DAY)*100
 #table <- cbind.data.frame(DATE, AGE_DAY, BMI_DAY, AMC_DAY, UAA_DAY, AMA_DAY, AFA_DAY, VCA_DAY, VC_PCTG_DAY, Z_DAY, P_DAY, ARPADI_FFM_DAY, GORAN_FFM_DAY, ARPADI_TBW_DAY, SCHAEFER_FFM_DAY, KOTLER_FFM_DAY, BODY_FAT_PCTG_DAY)
 
 
-#need to remove the means and standard deviations in order for the new interpolated means and standard deviations to work
-#rm(MEAN_NHANES_HT, SD_NHANES_HT, MEAN_NHANES_WT, SD_NHANES_WT, MEAN_NHANES_BMI, SD_NHANES_BMI, MEAN_NHANES_UAC, SD_NHANES_UAC, MEAN_NHANES_TSF, SD_NHANES_TSF, MEAN_NHANES_UAA, SD_NHANES_UAA, MEAN_NHANES_AMA, SD_NHANES_AMA, MEAN_NHANES_AFA, SD_NHANES_AFA, MEAN_NHANES_SSF, SD_NHANES_SSF, MEAN_NHANES_UC, SD_NHANES_UC, MEAN_NHANES_WT_FOR_HT, SD_NHANES_WT_FOR_HT) 
-#rm(L_CDC_WT, M_CDC_WT, S_CDC_WT, L_CDC_HT, M_CDC_HT, S_CDC_HT, L_CDC_BMI, M_CDC_BMI, S_CDC_BMI, L_CDC_WT_HT, M_CDC_WT_HT, S_CDC_WT_HT, L_CDC_HC, M_CDC_HC, S_CDC_HC)
-#rm(L_WHO_HT, M_WHO_HT, S_WHO_HT, L_WHO_BMI, M_WHO_BMI, S_WHO_BMI, L_WHO_HC, M_WHO_HC, S_WHO_HC, L_WHO_SSF, M_WHO_SSF, S_WHO_SSF, L_WHO_TSF, M_WHO_TSF, S_WHO_TSF, L_WHO_UAC, M_WHO_UAC, S_WHO_UAC, L_WHO_WT, M_WHO_WT, S_WHO_WT, L_WHO_WT_HT, M_WHO_WT_HT, S_WHO_WT_HT) 
-
 
 #Race for NHANES
 RACE <- if (Demographics.Identified$RACE[1] == "White"){RACE <- 2} else if (Demographics.Identified$RACE[1] == "Asian"){RACE <- 2}  else if (Demographics.Identified$RACE[1] == "African-American"){RACE <- 1} else if (Demographics.Identified$RACE[1] == "Hispanic"){RACE <- 2}
@@ -1169,7 +1157,7 @@ NHANES_WT_HT_PCTL_DAY <- (pnorm(NHANES_WT_HT_Z_DAY))*100
 
 
 #CDC R script
-#yearfrac from EXCEL
+
 #same SEX as NHANES, need to calculate Age in months
 i=1:dim(Anthropometrics)[1]
 Bday <- as.Date(Demographics.Identified$DOB[1], format= "%m/%d/%Y") #First convert classes from factor to date
@@ -1407,8 +1395,6 @@ GC_DAY <- (NHANES_UC_Z_DAY* VC_PCTG_DAY)/100
 
 
 
-#for day type drag the number in the previous date to the next date
-#for source use number '4' to indicate interpolated date
 #finaltable <- cbind.data.frame(MRNUMBER, DATE, DAY_TYPE, SOURCE, HT, WT, HC, UAC, TSF, SSF, USF, SISF, MBSF, UC, R, X, CDC_HT_PCTL, CDC_HT_Z, WHO_HT_PCTL, WHO_HT_Z, NHANES_HT_PCTL, NHANES_HT_Z, CDC_WT_PCTL, CDC_WT_Z, WHO_WT_PCTL, WHO_WT_Z, NHANES_WT_PCTL, NHANES_WT_Z, BMI,  CDC_BMI_PCTL, CDC_BMI_Z, WHO_BMI_PCTL, WHO_BMI_Z, NHANES_BMI_PCTL, NHANES_BMI_Z, CDC_WT_HT_PCTL, CDC_WT_HT_Z, WHO_WT_HT_PCTL, WHO_WT_HT_Z, NHANES_WT_HT_PCTL, NHANES_WT_HT_Z, CDC_HC_PCTL, CDC_HC_Z, WHO_HC_PCTL, WHO_HC_Z, WHO_UAC_PCTL, WHO_UAC_Z, NHANES_UAC_PCTL, NHANES_UAC_Z, WHO_TSF_PCTL, WHO_TSF_Z, NHANES_TSF_PCTL, NHANES_TSF_Z, UAA, NHANES_UAA_PCTL, NHANES_UAA_Z, AMC, AMA, NHANES_AMA_PCTL, NHANES_AMA_Z, AFA, NHANES_AFA_PCTL, NHANES_AFA_Z, WHO_SSF_PCTL, WHO_SSF_Z, NHANES_SSF_PCTL, NHANES_SSF_Z, NHANES_UC_PCTL, NHANES_UC_Z, VCA, VC_PCTG, GC, Z, P, ARPADI_FFM, GORAN_FFM, SCHAEFER_FFM, KOTLER_FFM, BODY_FAT_PCTG, HT_DAY, WT_DAY, HC_DAY, UAC_DAY, TSF_DAY, SSF_DAY, USF_DAY, SISF_DAY, MBSF_DAY, UC_DAY, R_DAY, X_DAY, CDC_HT_PCTL_DAY, CDC_HT_Z_DAY, WHO_HT_PCTL_DAY, WHO_HT_Z_DAY, NHANES_HT_PCTL_DAY, NHANES_HT_Z_DAY, CDC_WT_PCTL_DAY, CDC_WT_Z_DAY, WHO_WT_PCTL_DAY, WHO_WT_Z_DAY, NHANES_WT_PCTL_DAY, NHANES_WT_Z_DAY, BMI_DAY, CDC_BMI_PCTL_DAY, CDC_BMI_Z_DAY, WHO_BMI_PCTL_DAY, WHO_BMI_Z_DAY, NHANES_BMI_PCTL_DAY, NHANES_BMI_Z_DAY, CDC_WT_HT_PCTL_DAY, CDC_WT_HT_Z_DAY, WHO_WT_HT_PCTL_DAY, WHO_WT_HT_Z_DAY, NHANES_WT_HT_PCTL_DAY, NHANES_WT_HT_Z_DAY, CDC_HC_PCTL_DAY, CDC_HC_Z_DAY, WHO_HC_PCTL_DAY, WHO_HC_Z_DAY, WHO_UAC_PCTL_DAY, WHO_UAC_Z_DAY, NHANES_UAC_PCTL_DAY, NHANES_UAC_Z_DAY, WHO_TSF_PCTL_DAY, WHO_TSF_Z_DAY, NHANES_TSF_PCTL_DAY, NHANES_TSF_Z_DAY, UAA_DAY, NHANES_UAA_PCTL_DAY, NHANES_UAA_Z_DAY, AMC_DAY, AMA_DAY, NHANES_AMA_PCTL_DAY, NHANES_AMA_Z_DAY, AFA_DAY, NHANES_AFA_PCTL_DAY, NHANES_AFA_Z_DAY, WHO_SSF_PCTL_DAY, WHO_SSF_Z_DAY, NHANES_SSF_PCTL_DAY, NHANES_SSF_Z_DAY, NHANES_UC_PCTL_DAY, NHANES_UC_Z_DAY, VCA_DAY, VC_PCTG_DAY, GC_DAY, Z_DAY, P_DAY, ARPADI_FFM_DAY, GORAN_FFM_DAY, ARPADI_TBW_DAY, SCHAEFER_FFM_DAY, KOTLER_FFM_DAY, BODY_FAT_PCTG_DAY)
 
 
@@ -1461,9 +1447,7 @@ sub2 <- AGE_DAY > 2
 sub2 <- sub2[1:a-1]
 finaltable$PA_DAY[1:a-1] <- ifelse(sub2==TRUE, b, finaltable$PA_DAY)
 
-#table$`finaltable$PA_DAY`[1:a-1]
 
-#!is.na(table$`finaltable$PA_DAY`) & AGE_DAY > 18
 c <- which((!is.na(finaltable$PA_DAY) & AGE_DAY > 18)==TRUE)[1]
 d <- finaltable$PA_DAY[c]
 sub3 <- AGE_DAY > 18
@@ -1473,7 +1457,7 @@ finaltable$PA_DAY[1:c-1] <- ifelse(sub3==TRUE, d, finaltable$PA_DAY)
 finaltable$PA_DAY <- c(NA, finaltable$PA_DAY[!is.na(finaltable$PA_DAY)])[cumsum(!is.na(finaltable$PA_DAY)) + 1]
 
 
-#final product
+#final
 z <- dim(finaltable)[1]
 finaltable$MRNUMBER <- rep.int(finaltable$MRNUMBER[1], z)
 finaltable <- finaltable[ , c(2, 1, 3:ncol(finaltable)) ]
