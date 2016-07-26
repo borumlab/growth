@@ -1483,6 +1483,7 @@ xlsx <- "ANTHROPOMETRICS_CLINICAL.xlsx"
 xlsx <- gsub(" ","", paste(patient,"_", xlsx))
 write.xlsx2(finaltable,file=xlsx,row.names=FALSE, showNA=FALSE)
 
+
 #Anthropometric GRAPH
 #Graph is different depending on if patient is naive or experienced
 naive <- ifelse(Demographics.Identified$STRATA[1] == "N", TRUE, FALSE)
@@ -1549,10 +1550,20 @@ anthrograph <- p + geom_line(aes(y=HT, colour="Height Z-score"), size=1.5) +
 #save in patient folder, need to fix title
 ggsave(anthrograph, file="anthrograph.png", height=4.5, width=6.61, units='in', dpi=600)
 
-
-
-
-
+#upload to MySQL function, need to run upload_anthros_database first
+database <- function() {
+  print("Would you like to upload anthropometrics data into a MySQL database?")
+  print("Type 'YES' to do so, else type 'NO'")
+  rl <- " "
+  while (tolower(rl)!="yes" && tolower(rl)!="no") {
+    rl <- readline(prompt="Enter here: ")
+  }
+  if (tolower(rl)=="yes") {
+    finaltable<-subset(finaltable,select=-c(AGE,COMMENTS))
+    uploadanthros(finaltable)
+  }
+}
+database()
 
 
 #use rm below to clean working directory so that you can automatically go to next patient?
