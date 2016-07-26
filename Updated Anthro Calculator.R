@@ -25,6 +25,10 @@ anthro <- function() {
   } 
   library(lubridate) 
   options(lubridate.verbose = FALSE)
+  if (!require("ggplot2")) { 
+    install.packages("ggplot2") 
+  } 
+  library(ggplot2)
   
   
   print("Input the four letters that signify the patient we are doing calculations for") 
@@ -1478,6 +1482,78 @@ finaltable <- as.data.frame(append(finaltable, list(AGE = AGE), after=4))
 xlsx <- "ANTHROPOMETRICS_CLINICAL.xlsx"
 xlsx <- gsub(" ","", paste(patient,"_", xlsx))
 write.xlsx2(finaltable,file=xlsx,row.names=FALSE, showNA=FALSE)
+
+#Anthropometric GRAPH
+#Graph is different depending on if patient is naive or experienced
+naive <- ifelse(Demographics.Identified$STRATA[1] == "N", TRUE, FALSE)
+
+
+if (naive == TRUE) {
+  graphdata <- finaltable[finaltable$SOURCE==1 & finaltable$DAY_TYPE!=3,]
+} else if (naive == FALSE) {
+  before <- finaltable$DATE<Demographics.Identified$PKT_PROSPECTIVE_DATE
+  graphdata1 <- finaltable[before,]
+  graphdata1 <- graphdata1[graphdata1$SOURCE==2,]
+  after <- (finaltable$DATE)>=(Demographics.Identified$PKT_PROSPECTIVE_DATE)
+  graphdata2 <- finaltable[after,]
+  graphdata2 <- graphdata2[graphdata2$SOURCE==1,]
+  graphdata <- rbind(graphdata1, graphdata2)
+  graphdata <- graphdata[graphdata$DAY_TYPE!=3,]
+  
+}
+
+
+AGE <- floor(graphdata$AGE)
+
+HT <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_HT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_HT_Z_DAY, graphdata$NHANES_HT_Z_DAY))
+WT <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_WT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_WT_Z_DAY, graphdata$NHANES_WT_Z_DAY))
+BMI <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_Z_DAY, ifelse(AGE < 2, graphdata$WHO_BMI_Z_DAY, graphdata$NHANES_BMI_Z_DAY))
+
+#To see what values are being graphed:
+DATE <- graphdata$DATE
+data1 <- cbind.data.frame(DATE, HT, WT, BMI)
+
+
+#for y-axis labels
+z <- c(HT, WT, BMI)
+z1 <- floor((min(z))/0.5)*0.5
+z2 <- ceiling((max(z))/0.5)*0.5
+
+p <- ggplot(data1, aes(x=DATE))
+anthrograph <- p + geom_line(aes(y=HT, colour="Height Z-score"), size=1.5) + 
+  geom_point(aes(y=HT, shape="Height Z-score", color="Height Z-score"), size=5) +
+  geom_line(aes(y=WT, colour="Weight Z-score"), size=1.5) + 
+  geom_point(aes(y=WT, shape="Weight Z-score", color="Weight Z-score"), size=4) +
+  geom_line(aes(y=BMI, colour="BMI Z-score"), size=1.5) + 
+  geom_point(aes(y=BMI, shape="BMI Z-score", color="BMI Z-score"), size=4) +
+  xlab("Clinic Date") + 
+  ylab("Z-scores") +
+  labs(title="Anthropometric Z-Scores Graph") +
+  geom_hline(yintercept=seq(z1, z2, by=0.5)) +
+  scale_y_continuous(breaks=seq(z1, z2, by=0.5)) +
+  scale_x_date(breaks=datebreaks, date_labels= "%m/%d/%y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(size=11),
+        axis.title.x = element_text(size=12),
+        axis.text.y = element_text(size=11),
+        axis.title.y = element_text(size=12),
+        title = element_text(size=12),
+        legend.position="bottom",
+        legend.background=element_rect(fill="white", colour="black"),
+        legend.text=element_text(size=11),
+        legend.key.width=unit(2, "line")) +
+  scale_colour_manual(name = "", values=c("Height Z-score" = "orange", "Weight Z-score"="purple", "BMI Z-score" = "green3")) +
+  scale_shape_manual(name = "", values=c("Height Z-score" = 18, "Weight Z-score"=15, "BMI Z-score"=17))
+
+
+#save in patient folder, need to fix title
+ggsave(anthrograph, file="anthrograph.png", height=4.5, width=6.61, units='in', dpi=600)
+
+
+
+
+
+
 
 #use rm below to clean working directory so that you can automatically go to next patient?
 rm(list=ls())
