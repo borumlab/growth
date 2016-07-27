@@ -74,8 +74,8 @@ library(lubridate)
 span <- interval(Bday, Date)
 AGE <- as.period(span)
 AGE <- as.numeric(year(AGE))
-#to remove unwanted variables
-rm(i, Bday, span)
+AGE_MO <- as.period(span, "months")
+AGE_MO <- as.numeric(month(AGE_MO))
 
 
 
@@ -174,6 +174,9 @@ MEAN_NHANES_UC <- c()
 SD_NHANES_UC <- c()
 MEAN_NHANES_WT_FOR_HT <- c()
 SD_NHANES_WT_FOR_HT <- c()
+L_NHANES_UC <- c()
+M_NHANES_UC <- c()
+S_NHANES_UC <- c()
 
 for (i in seq(length(AGE))) {
   MEAN_NHANES_HT <- c(MEAN_NHANES_HT, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_HT_AGE==AGE[i] & NHANES.References$SEX_NHANES_HT_AGE==SEX & NHANES.References$RACE_NHANES_HT_AGE==RACE, select=c("MEAN_NHANES_HT_AGE")))
@@ -196,14 +199,26 @@ for (i in seq(length(AGE))) {
   SD_NHANES_SSF <- c(SD_NHANES_SSF, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_SSSF_AGE==AGE[i] & NHANES.References$SEX_NHANES_SSSF_AGE==SEX & NHANES.References$RACE_NHANES_SSSF_AGE==RACE, select=c("SD_NHANES_SSSF_AGE")))
   
 }
-  
-  for (i in seq(length(AGE))) {
+
+#For NHANES UC (waist circumference)
+a <- (AGE <= 4 | AGE >= 19)
+AGE_UC <- ifelse(AGE <= 4 | AGE >= 19, AGE, AGE_MO)
+
+for (i in which(AGE<=4 | AGE>=19)) {
   RACE <- if (Demographics.Identified$RACE[1] == "White"){RACE <- 2} else if (Demographics.Identified$RACE[1] == "Asian"){RACE <- 2}  else if (Demographics.Identified$RACE[1] == "African-American"){RACE <- 1} else if (Demographics.Identified$RACE[1] == "Hispanic"){RACE <- 3}  
-  MEAN_NHANES_UC <- c(MEAN_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_UC_AGE==AGE[i] & NHANES.References$SEX_NHANES_UC_AGE==SEX & NHANES.References$RACE_NHANES_UC_AGE==RACE, select=c("MEAN_NHANES_UC_AGE")))
-  SD_NHANES_UC <- c(SD_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_UC_AGE==AGE[i] & NHANES.References$SEX_NHANES_UC_AGE==SEX & NHANES.References$RACE_NHANES_UC_AGE==RACE, select=c("SD_NHANES_UC_AGE")))
+  MEAN_NHANES_UC <- c(MEAN_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE==SEX & NHANES.References$RACE_NHANES_UC_AGE==RACE, select=c("MEAN_NHANES_UC_AGE")))
+  SD_NHANES_UC <- c(SD_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE==SEX & NHANES.References$RACE_NHANES_UC_AGE==RACE, select=c("SD_NHANES_UC_AGE")))
+  
   
 }
 
+for (i in which(!(AGE<=4 | AGE>=19))) {
+  L_NHANES_UC <- c(L_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_MO_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE2==SEX, select=c("L_NHANES_UC")))
+  M_NHANES_UC <- c(M_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_MO_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE2==SEX, select=c("M_NHANES_UC")))
+  S_NHANES_UC <- c(S_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_MO_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE2==SEX, select=c("S_NHANES_UC")))
+}
+
+#For NHANES WT for HT
 for (i in seq(length(AGE))) {
   if (AGE[i] <= 11) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("MEAN_NHANES_WT_FOR_HT1")))
@@ -243,7 +258,32 @@ MEAN_NHANES_UC <- as.numeric(MEAN_NHANES_UC)
 SD_NHANES_UC <- as.numeric(SD_NHANES_UC)
 MEAN_NHANES_WT_FOR_HT <- as.numeric(MEAN_NHANES_WT_FOR_HT)
 SD_NHANES_WT_FOR_HT <- as.numeric(SD_NHANES_WT_FOR_HT)
+L_NHANES_UC <- as.numeric(L_NHANES_UC)
+M_NHANES_UC <- as.numeric(M_NHANES_UC)
+S_NHANES_UC <- as.numeric(S_NHANES_UC)
 
+#for some reason ifelse does not work in this case
+#so instead convert true/false to numeric, and replace
+b <- as.numeric(a)
+b[b==0] <- L_NHANES_UC
+b[b==1] <- NA
+L_NHANES_UC <- b
+b <- as.numeric(a)
+b[b==0] <- M_NHANES_UC
+b[b==1] <- NA
+M_NHANES_UC <- b
+b <- as.numeric(a)
+b[b==0] <- S_NHANES_UC
+b[b==1] <- NA
+S_NHANES_UC <- b
+b <- as.numeric(a)
+b[b==1] <- MEAN_NHANES_UC
+b[b==0] <- NA
+MEAN_NHANES_UC <- b
+b <- as.numeric(a)
+b[b==1] <- SD_NHANES_UC
+b[b==0] <- NA
+SD_NHANES_UC <- b
 
 #table2 <- cbind(AGE, MEAN_NHANES_SSF, SD_NHANES_SSF, MEAN_NHANES_AFA, SD_NHANES_AFA, MEAN_NHANES_AMA, SD_NHANES_AMA, MEAN_NHANES_BMI, SD_NHANES_BMI, MEAN_NHANES_HT, SD_NHANES_HT, MEAN_NHANES_TSF, SD_NHANES_TSF, MEAN_NHANES_UAC, SD_NHANES_UAC, MEAN_NHANES_UAA, SD_NHANES_UAC, MEAN_NHANES_UC, SD_NHANES_UC, MEAN_NHANES_WT, SD_NHANES_WT, MEAN_NHANES_WT_FOR_HT, SD_NHANES_WT_FOR_HT)
 
@@ -305,7 +345,13 @@ NHANES_AMA_Z <- (AMA-MEAN_NHANES_AMA)/SD_NHANES_AMA
 NHANES_AMA_PCTL <- (pnorm(NHANES_AMA_Z))*100
 
 #NHANES_WAIST_CIRCUMFERENCE_Z_SCORE
-NHANES_UC_Z <- (Anthropometrics$UC-MEAN_NHANES_UC)/SD_NHANES_UC
+NHANES_UC_Z1 <- (((Anthropometrics$UC/M_NHANES_UC)^L_NHANES_UC)-1)/(L_NHANES_UC*S_NHANES_UC)
+NHANES_UC_Z2 <- (Anthropometrics$UC-MEAN_NHANES_UC)/SD_NHANES_UC
+NHANES_UC_Z1[is.na(NHANES_UC_Z1)] <- " "
+NHANES_UC_Z2[is.na(NHANES_UC_Z2)] <- " "
+NHANES_UC_Z <- as.numeric(paste(NHANES_UC_Z1, NHANES_UC_Z2))
+
+
 
 #NHANES_WAIST_CIRCUMFERENCE_PERCENTILE
 NHANES_UC_PCTL <- (pnorm(NHANES_UC_Z))*100
@@ -916,7 +962,8 @@ span <- interval(Bday, DATE)
 AGE_DAY <- as.period(span)
 AGE_DAY <- as.numeric(year(AGE_DAY))
 #to remove unwanted variables
-rm(i, Bday, span)
+AGE_MO <- as.period(span, "months")
+AGE_MO <- as.numeric(month(AGE_MO))
 #below defined to use for final table
 
 
@@ -1013,6 +1060,10 @@ MEAN_NHANES_UC <- c()
 SD_NHANES_UC <- c()
 MEAN_NHANES_WT_FOR_HT <- c()
 SD_NHANES_WT_FOR_HT <- c()
+L_NHANES_UC <- c()
+M_NHANES_UC <- c()
+S_NHANES_UC <- c()
+
 
 for (i in seq(length(AGE_DAY))) {
   MEAN_NHANES_HT <- c(MEAN_NHANES_HT, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_HT_AGE==AGE_DAY[i] & NHANES.References$SEX_NHANES_HT_AGE==SEX & NHANES.References$RACE_NHANES_HT_AGE==RACE, select=c("MEAN_NHANES_HT_AGE")))
@@ -1034,14 +1085,26 @@ for (i in seq(length(AGE_DAY))) {
   MEAN_NHANES_SSF <- c(MEAN_NHANES_SSF, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_SSSF_AGE==AGE_DAY[i] & NHANES.References$SEX_NHANES_SSSF_AGE==SEX & NHANES.References$RACE_NHANES_SSSF_AGE==RACE, select=c("MEAN_NHANES_SSSF_AGE")))
   SD_NHANES_SSF <- c(SD_NHANES_SSF, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_SSSF_AGE==AGE_DAY[i] & NHANES.References$SEX_NHANES_SSSF_AGE==SEX & NHANES.References$RACE_NHANES_SSSF_AGE==RACE, select=c("SD_NHANES_SSSF_AGE")))
 }
- 
-for (i in seq(length(AGE_DAY))) { 
+
+#For NHANES UC (waist circumference)
+a <- (AGE_DAY <= 4 | AGE_DAY >= 19)
+AGE_UC <- ifelse(AGE_DAY <= 4 | AGE_DAY >= 19, AGE_DAY, AGE_MO)
+
+for (i in which(AGE_DAY<=4 | AGE_DAY>=19)) {
   RACE <- if (Demographics.Identified$RACE[1] == "White"){RACE <- 2} else if (Demographics.Identified$RACE[1] == "Asian"){RACE <- 2}  else if (Demographics.Identified$RACE[1] == "African-American"){RACE <- 1} else if (Demographics.Identified$RACE[1] == "Hispanic"){RACE <- 3}  
-  MEAN_NHANES_UC <- c(MEAN_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_UC_AGE==AGE_DAY[i] & NHANES.References$SEX_NHANES_UC_AGE==SEX & NHANES.References$RACE_NHANES_UC_AGE==RACE, select=c("MEAN_NHANES_UC_AGE")))
-  SD_NHANES_UC <- c(SD_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_UC_AGE==AGE_DAY[i] & NHANES.References$SEX_NHANES_UC_AGE==SEX & NHANES.References$RACE_NHANES_UC_AGE==RACE, select=c("SD_NHANES_UC_AGE")))
+  MEAN_NHANES_UC <- c(MEAN_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE==SEX & NHANES.References$RACE_NHANES_UC_AGE==RACE, select=c("MEAN_NHANES_UC_AGE")))
+  SD_NHANES_UC <- c(SD_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_YEAR_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE==SEX & NHANES.References$RACE_NHANES_UC_AGE==RACE, select=c("SD_NHANES_UC_AGE")))
+  
   
 }
 
+for (i in which(!(AGE_DAY<=4 | AGE_DAY>=19))) {
+  L_NHANES_UC <- c(L_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_MO_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE2==SEX, select=c("L_NHANES_UC")))
+  M_NHANES_UC <- c(M_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_MO_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE2==SEX, select=c("M_NHANES_UC")))
+  S_NHANES_UC <- c(S_NHANES_UC, subset(NHANES.References, NHANES.References$AGE_MO_NHANES_UC_AGE==AGE_UC[i] & NHANES.References$SEX_NHANES_UC_AGE2==SEX, select=c("S_NHANES_UC")))
+}
+
+#NHANES WT for HT
 for (i in seq(length(AGE_DAY))) {
   if (AGE_DAY[i] <= 11) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("MEAN_NHANES_WT_FOR_HT1")))
@@ -1081,6 +1144,34 @@ MEAN_NHANES_UC <- as.numeric(MEAN_NHANES_UC)
 SD_NHANES_UC <- as.numeric(SD_NHANES_UC)
 MEAN_NHANES_WT_FOR_HT <- as.numeric(MEAN_NHANES_WT_FOR_HT)
 SD_NHANES_WT_FOR_HT <- as.numeric(SD_NHANES_WT_FOR_HT)
+MEAN_NHANES_UC <- as.numeric(MEAN_NHANES_UC)
+SD_NHANES_UC <- as.numeric(SD_NHANES_UC)
+L_NHANES_UC <- as.numeric(L_NHANES_UC)
+M_NHANES_UC <- as.numeric(M_NHANES_UC)
+S_NHANES_UC <- as.numeric(S_NHANES_UC)
+#for some reason ifelse does not work in this case
+#so instead convert true/false to numeric, and replace
+b <- as.numeric(a)
+b[b==0] <- L_NHANES_UC
+b[b==1] <- NA
+L_NHANES_UC <- b
+b <- as.numeric(a)
+b[b==0] <- M_NHANES_UC
+b[b==1] <- NA
+M_NHANES_UC <- b
+b <- as.numeric(a)
+b[b==0] <- S_NHANES_UC
+b[b==1] <- NA
+S_NHANES_UC <- b
+b <- as.numeric(a)
+b[b==1] <- MEAN_NHANES_UC
+b[b==0] <- NA
+MEAN_NHANES_UC <- b
+b <- as.numeric(a)
+b[b==1] <- SD_NHANES_UC
+b[b==0] <- NA
+SD_NHANES_UC <- b
+
 
 
 #table2 <- cbind(AGE_DAY, MEAN_NHANES_SSF, SD_NHANES_SSF, MEAN_NHANES_AFA, SD_NHANES_AFA, MEAN_NHANES_AMA, SD_NHANES_AMA, MEAN_NHANES_BMI, SD_NHANES_BMI, MEAN_NHANES_HT, SD_NHANES_HT, MEAN_NHANES_TSF, SD_NHANES_TSF, MEAN_NHANES_UAC, SD_NHANES_UAC, MEAN_NHANES_UAA, SD_NHANES_UAC, MEAN_NHANES_UC, SD_NHANES_UC, MEAN_NHANES_WT, SD_NHANES_WT, MEAN_NHANES_WT_FOR_HT, SD_NHANES_WT_FOR_HT)
@@ -1143,7 +1234,11 @@ NHANES_AMA_Z_DAY <- (AMA_DAY-MEAN_NHANES_AMA)/SD_NHANES_AMA
 NHANES_AMA_PCTL_DAY <- (pnorm(NHANES_AMA_Z_DAY))*100
 
 #NHANES_WAIST_CIRCUMFERENCE_Z_SCORE
-NHANES_UC_Z_DAY <- (UC_DAY-MEAN_NHANES_UC)/SD_NHANES_UC
+NHANES_UC_Z_DAY1 <- (((UC_DAY/M_NHANES_UC)^L_NHANES_UC)-1)/(L_NHANES_UC*S_NHANES_UC)
+NHANES_UC_Z_DAY2 <- (UC_DAY-MEAN_NHANES_UC)/SD_NHANES_UC
+NHANES_UC_Z_DAY1[is.na(NHANES_UC_Z_DAY1)] <- " "
+NHANES_UC_Z_DAY2[is.na(NHANES_UC_Z_DAY2)] <- " "
+NHANES_UC_Z_DAY <- as.numeric(paste(NHANES_UC_Z_DAY1, NHANES_UC_Z_DAY2))
 
 #NHANES_WAIST_CIRCUMFERENCE_PERCENTILE
 NHANES_UC_PCTL_DAY <- (pnorm(NHANES_UC_Z_DAY))*100
@@ -1156,7 +1251,8 @@ NHANES_WT_HT_PCTL_DAY <- (pnorm(NHANES_WT_HT_Z_DAY))*100
 
 
 
-
+#for checking NHANES UC: 
+tab <- cbind(AGE_DAY, AGE_UC, UC_DAY, MEAN_NHANES_UC, SD_NHANES_UC, L_NHANES_UC, M_NHANES_UC, S_NHANES_UC, NHANES_UC_Z_DAY1, NHANES_UC_Z_DAY2, NHANES_UC_Z_DAY)
 
 #table3 <- cbind(NHANES_HT_PCTL_DAY, NHANES_HT_Z_DAY, NHANES_WT_PCTL_DAY, NHANES_WT_Z_DAY, NHANES_BMI_PCTL_DAY, NHANES_BMI_Z_DAY, NHANES_UAC_PCTL_DAY, NHANES_UAC_Z_DAY, NHANES_TSF_PCTL_DAY, NHANES_TSF_Z_DAY, NHANES_UAA_PCTL_DAY, NHANES_UAA_Z_DAY, NHANES_AMA_PCTL_DAY, NHANES_AMA_Z_DAY, NHANES_AFA_PCTL_DAY, NHANES_AFA_Z_DAY, NHANES_SSF_PCTL_DAY, NHANES_SSF_Z_DAY, NHANES_UC_PCTL_DAY, NHANES_UC_Z_DAY, NHANES_WT_HT_Z_DAY, NHANES_WT_HT_PCTL_DAY)
 
@@ -1513,12 +1609,15 @@ BMI <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_Z_DAY, ifelse(AGE < 2, gra
 #To see what values are being graphed:
 DATE <- graphdata$DATE
 data1 <- cbind.data.frame(DATE, HT, WT, BMI)
+data1 <- data1[complete.cases(data1),]
 
 
 #for y-axis labels
-z <- c(HT, WT, BMI)
+z <- c(data1$HT, data1$WT, data1$BMI)
 z1 <- floor((min(z))/0.5)*0.5
 z2 <- ceiling((max(z))/0.5)*0.5
+
+datebreaks <- seq.Date(min(DATE), max(DATE), length.out=8)
 
 p <- ggplot(data1, aes(x=DATE))
 anthrograph <- p + geom_line(aes(y=HT, colour="Height Z-score"), size=1.5) + 
@@ -1548,7 +1647,9 @@ anthrograph <- p + geom_line(aes(y=HT, colour="Height Z-score"), size=1.5) +
 
 
 #save in patient folder, need to fix title
-ggsave(anthrograph, file="anthrograph.png", height=4.5, width=6.61, units='in', dpi=600)
+png <- "ANTHROPOMETRICS_GRAPH.png"
+png <- gsub(" ","", paste(patient,"_", png))
+ggsave(anthrograph, file=png, height=4.5, width=6.61, units='in', dpi=600)
 
 #upload to MySQL function, need to run upload_anthros_database first
 database <- function() {
