@@ -1702,7 +1702,7 @@ BMI_PCTL <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_PCTL_DAY, ifelse(AGE 
 #To see what values are being graphed:
 DATE <- graphdata$DATE
 MRNUMBER <- MRNUMBER[1:dim(graphdata)[1]]
-data1 <- cbind(DATE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE)
+data1 <- cbind.data.frame(DATE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE)
 data2 <- cbind.data.frame(MRNUMBER, DATE, AGE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE, HT_PCTL, WT_PCTL, BMI_PCTL)
 
 #Creating output table:
