@@ -1674,15 +1674,22 @@ HT_Z_SCORE <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_HT_Z_DAY, ifelse(AGE < 
 WT_Z_SCORE <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_WT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_WT_Z_DAY, graphdata$NHANES_WT_Z_DAY))
 BMI_Z_SCORE <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_Z_DAY, ifelse(AGE < 2, graphdata$WHO_BMI_Z_DAY, graphdata$NHANES_BMI_Z_DAY))
 
+HT_PCTL <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_HT_PCTL_DAY, ifelse(AGE < 2, graphdata$WHO_HT_PCTL_DAY, graphdata$NHANES_HT_PCTL_DAY))
+WT_PCTL <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_WT_PCTL_DAY, ifelse(AGE < 2, graphdata$WHO_WT_PCTL_DAY, graphdata$NHANES_WT_PCTL_DAY))
+BMI_PCTL <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_PCTL_DAY, ifelse(AGE < 2, graphdata$WHO_BMI_PCTL_DAY, graphdata$NHANES_BMI_PCTL_DAY))
+
+
+
 #To see what values are being graphed:
 DATE <- graphdata$DATE
 MRNUMBER <- MRNUMBER[1:dim(graphdata)[1]]
-data1 <- cbind.data.frame(MRNUMBER, DATE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE)
+data1 <- cbind(DATE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE)
+data2 <- cbind.data.frame(MRNUMBER, DATE, AGE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE, HT_PCTL, WT_PCTL, BMI_PCTL)
 
 #Creating output table:
 xlsx <- "ANTHROPOMETRICS_GRAPH_VALUES.xlsx"
 xlsx <- gsub(" ","", paste(patient,"_", xlsx))
-write.xlsx2(data1,file=xlsx,row.names=FALSE, showNA=FALSE)
+write.xlsx2(data2,file=xlsx,row.names=FALSE, showNA=FALSE)
 
 
 #for y-axis labels
