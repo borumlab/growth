@@ -1668,32 +1668,37 @@ if (naive == TRUE) {
 }
 
 
-AGE <- floor(graphdata$AGE)
+AGE <- graphdata$AGE
 
-HT <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_HT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_HT_Z_DAY, graphdata$NHANES_HT_Z_DAY))
-WT <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_WT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_WT_Z_DAY, graphdata$NHANES_WT_Z_DAY))
-BMI <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_Z_DAY, ifelse(AGE < 2, graphdata$WHO_BMI_Z_DAY, graphdata$NHANES_BMI_Z_DAY))
+HT_Z_SCORE <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_HT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_HT_Z_DAY, graphdata$NHANES_HT_Z_DAY))
+WT_Z_SCORE <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_WT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_WT_Z_DAY, graphdata$NHANES_WT_Z_DAY))
+BMI_Z_SCORE <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_Z_DAY, ifelse(AGE < 2, graphdata$WHO_BMI_Z_DAY, graphdata$NHANES_BMI_Z_DAY))
 
 #To see what values are being graphed:
 DATE <- graphdata$DATE
-data1 <- cbind.data.frame(DATE, HT, WT, BMI)
-data1 <- data1[complete.cases(data1),]
+MRNUMBER <- MRNUMBER[1:dim(graphdata)[1]]
+data1 <- cbind.data.frame(MRNUMBER, DATE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE)
+
+#Creating output table:
+xlsx <- "ANTHROPOMETRICS_GRAPH_VALUES.xlsx"
+xlsx <- gsub(" ","", paste(patient,"_", xlsx))
+write.xlsx2(data1,file=xlsx,row.names=FALSE, showNA=FALSE)
 
 
 #for y-axis labels
-z <- c(data1$HT, data1$WT, data1$BMI)
+z <- c(data1$HT_Z_SCORE, data1$WT_Z_SCORE, data1$BMI_Z_SCORE)
 z1 <- floor((min(z))/0.5)*0.5
 z2 <- ceiling((max(z))/0.5)*0.5
 
 datebreaks <- seq.Date(min(DATE), max(DATE), length.out=8)
 
 p <- ggplot(data1, aes(x=DATE))
-anthrograph <- p + geom_line(aes(y=HT, colour="Height Z-score"), size=1.5) + 
-  geom_point(aes(y=HT, shape="Height Z-score", color="Height Z-score"), size=5) +
-  geom_line(aes(y=WT, colour="Weight Z-score"), size=1.5) + 
-  geom_point(aes(y=WT, shape="Weight Z-score", color="Weight Z-score"), size=4) +
-  geom_line(aes(y=BMI, colour="BMI Z-score"), size=1.5) + 
-  geom_point(aes(y=BMI, shape="BMI Z-score", color="BMI Z-score"), size=4) +
+anthrograph <- p + geom_line(aes(y=HT_Z_SCORE, colour="Height Z-score"), size=1.5) + 
+  geom_point(aes(y=HT_Z_SCORE, shape="Height Z-score", color="Height Z-score"), size=5) +
+  geom_line(aes(y=WT_Z_SCORE, colour="Weight Z-score"), size=1.5) + 
+  geom_point(aes(y=WT_Z_SCORE, shape="Weight Z-score", color="Weight Z-score"), size=4) +
+  geom_line(aes(y=BMI_Z_SCORE, colour="BMI Z-score"), size=1.5) + 
+  geom_point(aes(y=BMI_Z_SCORE, shape="BMI Z-score", color="BMI Z-score"), size=4) +
   xlab("Clinic Date") + 
   ylab("Z-score") +
   labs(title="Anthropometric Z-Scores Graph") +
