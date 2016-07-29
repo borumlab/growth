@@ -1112,7 +1112,7 @@ for (i in seq(length(AGE_DAY))) {
 #NHANES WT for HT
 
 for (i in seq(length(AGE_DAY))) {
-  if (AGE[i] <= 11 & SEX ==1) {
+  if (AGE_DAY[i] <= 11 & SEX ==1) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("MEAN_NHANES_WT_FOR_HT1")))
     SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("SD_NHANES_WT_FOR_HT1")))
   } 
@@ -1134,7 +1134,6 @@ for (i in seq(length(AGE_DAY))) {
   }
 
 }
-
 
 
 
