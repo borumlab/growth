@@ -202,19 +202,28 @@ for (i in seq(length(AGE))) {
   
 }
 
+
 #For NHANES WT for HT
 for (i in seq(length(AGE))) {
-  if (AGE[i] <= 11) {
+  if (AGE[i] <= 11 & SEX ==1) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("MEAN_NHANES_WT_FOR_HT1")))
     SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("SD_NHANES_WT_FOR_HT1")))
   } 
-  else if (AGE[i] > 11 & AGE[i] < 18) {
+  else if (AGE[i] > 11 & AGE[i] < 18 & SEX==1) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT2==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT2==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT2==HT[i], select=c("MEAN_NHANES_WT_FOR_HT2")))
     SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT2==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT2==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT2==HT[i], select=c("SD_NHANES_WT_FOR_HT2")))
   }
   else if (AGE[i] >= 18) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT3==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT3==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT3==HT[i], select=c("MEAN_NHANES_WT_FOR_HT3")))
     SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT3==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT3==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT3==HT[i], select=c("SD_NHANES_WT_FOR_HT3")))
+  }
+  else if (AGE[i] <= 10 & SEX==2 ) {
+    MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("MEAN_NHANES_WT_FOR_HT1")))
+    SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("SD_NHANES_WT_FOR_HT1")))
+  } 
+  else if (AGE[i] > 10 & AGE[i] < 18 & SEX==2) {
+    MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT2==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT2==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT2==HT[i], select=c("MEAN_NHANES_WT_FOR_HT2")))
+    SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT2==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT2==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT2==HT[i], select=c("SD_NHANES_WT_FOR_HT2")))
   }
 }
 
@@ -1101,12 +1110,13 @@ for (i in seq(length(AGE_DAY))) {
 
 
 #NHANES WT for HT
+
 for (i in seq(length(AGE_DAY))) {
-  if (AGE_DAY[i] <= 11) {
+  if (AGE[i] <= 11 & SEX ==1) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("MEAN_NHANES_WT_FOR_HT1")))
     SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("SD_NHANES_WT_FOR_HT1")))
   } 
-  else if (AGE_DAY[i] > 11 & AGE_DAY[i] < 18) {
+  else if (AGE_DAY[i] > 11 & AGE_DAY[i] < 18 & SEX==1) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT2==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT2==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT2==HT[i], select=c("MEAN_NHANES_WT_FOR_HT2")))
     SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT2==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT2==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT2==HT[i], select=c("SD_NHANES_WT_FOR_HT2")))
   }
@@ -1114,6 +1124,15 @@ for (i in seq(length(AGE_DAY))) {
     MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT3==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT3==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT3==HT[i], select=c("MEAN_NHANES_WT_FOR_HT3")))
     SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT3==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT3==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT3==HT[i], select=c("SD_NHANES_WT_FOR_HT3")))
   }
+  else if (AGE_DAY[i] <= 10 & SEX==2 ) {
+    MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("MEAN_NHANES_WT_FOR_HT1")))
+    SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT1==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT1==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT1==HT[i], select=c("SD_NHANES_WT_FOR_HT1")))
+  } 
+  else if (AGE_DAY[i] > 10 & AGE_DAY[i] < 18 & SEX==2) {
+    MEAN_NHANES_WT_FOR_HT <- c(MEAN_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT2==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT2==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT2==HT[i], select=c("MEAN_NHANES_WT_FOR_HT2")))
+    SD_NHANES_WT_FOR_HT <- c(SD_NHANES_WT_FOR_HT, subset(NHANES.References, NHANES.References$RACE_NHANES_WT_FOR_HT2==RACE & NHANES.References$SEX_NHANES_WT_FOR_HT2==SEX & NHANES.References$HEIGHT_NHANES_WT_FOR_HT2==HT[i], select=c("SD_NHANES_WT_FOR_HT2")))
+  }
+
 }
 
 
