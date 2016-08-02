@@ -32,7 +32,7 @@ uploadanthros <- function(finaltable) {
   h <- readline(prompt="Host: ")
   connect <- dbConnect(dbDriver("MySQL"),user=u,password=p,dbname=d,host=h)
   
-  dbSendQuery(connect,"USE borum_practice;")
+  dbSendQuery(connect,"USE patient_PKT;")
   
   # Query the last data found in both the ANTHROPOMETRICS_ID_RESEARCH table for
   # If there is no data in a table for that patient, let the user know. 
