@@ -2114,3 +2114,5 @@ database()
 
 #use rm below to clean working directory so that you can automatically go to next patient?
 rm(list=ls())
+
+#will delete this line
