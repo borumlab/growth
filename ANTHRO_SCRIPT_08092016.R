@@ -2019,6 +2019,12 @@ xlsx <- gsub(" ","", paste(patient,"_", xlsx))
 write.xlsx2(anthropometricsCheck,file=xlsx,row.names=FALSE, showNA=FALSE)
 
 #Anthropometric GRAPH
+
+first <- unique(demo[demo$MRNUMBER==finaltable$MRNUMBER[1],colnames(demo)=="FIRST"])
+last <- unique(demo[demo$MRNUMBER==finaltable$MRNUMBER[1],colnames(demo)=="LAST"])
+
+
+#Anthropometric GRAPH
 #Graph is different depending on if patient is naive or experienced
 naive <- ifelse(Demographics.Identified$STRATA[1] == "N", TRUE, FALSE)
 
@@ -2052,9 +2058,12 @@ BMI_PCTL <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_PCTL_DAY, ifelse(AGE 
 
 #To see what values are being graphed:
 DATE <- graphdata$DATE
-MRNUMBER <- MRNUMBER[1:dim(graphdata)[1]]
+MRNUMBER <- Anthropometrics$MRNUMBER[1:dim(graphdata)[1]]
 data1 <- cbind.data.frame(DATE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE)
 data2 <- cbind.data.frame(MRNUMBER, DATE, AGE, HT_Z_SCORE, WT_Z_SCORE, BMI_Z_SCORE, HT_PCTL, WT_PCTL, BMI_PCTL)
+
+
+setwd(directory)
 
 #Creating output table:
 xlsx <- "ANTHROPOMETRICS_GRAPH_VALUES.xlsx"
@@ -2069,6 +2078,10 @@ z2 <- ceiling((max(z))/0.5)*0.5
 
 datebreaks <- seq.Date(min(DATE), max(DATE), length.out=8)
 
+
+string <- paste(first,gsub(" ","",paste(last,":")),"Anthropometric Z-scores")
+
+
 p <- ggplot(data1, aes(x=DATE))
 anthrograph <- p + geom_line(aes(y=HT_Z_SCORE, colour="Height Z-score"), size=1.5) + 
   geom_point(aes(y=HT_Z_SCORE, shape="Height Z-score", color="Height Z-score"), size=5) +
@@ -2076,9 +2089,9 @@ anthrograph <- p + geom_line(aes(y=HT_Z_SCORE, colour="Height Z-score"), size=1.
   geom_point(aes(y=WT_Z_SCORE, shape="Weight Z-score", color="Weight Z-score"), size=4) +
   geom_line(aes(y=BMI_Z_SCORE, colour="BMI Z-score"), size=1.5) + 
   geom_point(aes(y=BMI_Z_SCORE, shape="BMI Z-score", color="BMI Z-score"), size=4) +
-  xlab("Clinic Date") + 
+  xlab("Date") + 
   ylab("Z-score") +
-  labs(title="Anthropometric Z-Scores Graph") +
+  ggtitle(string) +
   geom_hline(yintercept=seq(z1, z2, by=0.5)) +
   scale_y_continuous(breaks=seq(z1, z2, by=0.5)) +
   scale_x_date(breaks=datebreaks, date_labels= "%m/%d/%y") +
@@ -2095,11 +2108,14 @@ anthrograph <- p + geom_line(aes(y=HT_Z_SCORE, colour="Height Z-score"), size=1.
   scale_colour_manual(name = "", values=c("Height Z-score" = "orange", "Weight Z-score"="purple", "BMI Z-score" = "green3")) +
   scale_shape_manual(name = "", values=c("Height Z-score" = 18, "Weight Z-score"=15, "BMI Z-score"=17))
 
+setwd(directory)
 
-#save in patient folder, need to fix title
+#save in patient folder
 png <- "ANTHROPOMETRICS_GRAPH.png"
 png <- gsub(" ","", paste(patient,"_", png))
 ggsave(anthrograph, file=png, height=4.5, width=6.61, units='in', dpi=600)
+
+
 
 #function to upload anthros into MySQL
 uploadanthros <- function(finaltable){
