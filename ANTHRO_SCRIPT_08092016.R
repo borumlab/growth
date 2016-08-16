@@ -2020,8 +2020,8 @@ write.xlsx2(anthropometricsCheck,file=xlsx,row.names=FALSE, showNA=FALSE)
 
 #Anthropometric GRAPH
 
-first <- unique(demo[demo$MRNUMBER==finaltable$MRNUMBER[1],colnames(demo)=="FIRST"])
-last <- unique(demo[demo$MRNUMBER==finaltable$MRNUMBER[1],colnames(demo)=="LAST"])
+first <- unique(Demographics.Identified[Demographics.Identified$MRNUMBER==finaltable$MRNUMBER[1],colnames(Demographics.Identified)=="FIRST"])
+last <- unique(Demographics.Identified[Demographics.Identified$MRNUMBER==finaltable$MRNUMBER[1],colnames(Demographics.Identified)=="LAST"])
 
 
 #Anthropometric GRAPH
@@ -2054,6 +2054,30 @@ HT_PCTL <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_HT_PCTL_DAY, ifelse(AGE < 
 WT_PCTL <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_WT_PCTL_DAY, ifelse(AGE < 2, graphdata$WHO_WT_PCTL_DAY, graphdata$NHANES_WT_PCTL_DAY))
 BMI_PCTL <- ifelse(AGE >= 2 & AGE <= 20, graphdata$CDC_BMI_PCTL_DAY, ifelse(AGE < 2, graphdata$WHO_BMI_PCTL_DAY, graphdata$NHANES_BMI_PCTL_DAY))
 
+#for patients whose age is 20 but greater than 240 months, using NHANES for these patients
+if (anyNA(HT_Z_SCORE) == TRUE ) {
+  HT_Z_SCORE <- ifelse(AGE >= 2 & AGE < 20, graphdata$CDC_HT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_HT_Z_DAY, graphdata$NHANES_HT_Z_DAY))
+} 
+
+if (anyNA(WT_Z_SCORE) == TRUE) {
+  WT_Z_SCORE <- ifelse(AGE >= 2 & AGE < 20, graphdata$CDC_WT_Z_DAY, ifelse(AGE < 2, graphdata$WHO_WT_Z_DAY, graphdata$NHANES_WT_Z_DAY))
+}
+
+if (anyNA(BMI_Z_SCORE) == TRUE) {
+  BMI_Z_SCORE <- ifelse(AGE >= 2 & AGE < 20, graphdata$CDC_BMI_Z_DAY, ifelse(AGE < 2, graphdata$WHO_BMI_Z_DAY, graphdata$NHANES_BMI_Z_DAY))
+}
+
+if (anyNA(HT_PCTL) == TRUE ) {
+  HT_PCTL <- ifelse(AGE >= 2 & AGE < 20, graphdata$CDC_HT_PCTL_DAY, ifelse(AGE < 2, graphdata$WHO_HT_PCTL_DAY, graphdata$NHANES_HT_PCTL_DAY))
+}
+
+if (anyNA(WT_PCTL) == TRUE) {
+  WT_PCTL <- ifelse(AGE >= 2 & AGE < 20, graphdata$CDC_WT_PCTL_DAY, ifelse(AGE < 2, graphdata$WHO_WT_PCTL_DAY, graphdata$NHANES_WT_PCTL_DAY))
+}
+
+if (anyNA(BMI_PCTL) == TRUE) {
+  BMI_PCTL <- ifelse(AGE >= 2 & AGE < 20, graphdata$CDC_BMI_PCTL_DAY, ifelse(AGE < 2, graphdata$WHO_BMI_PCTL_DAY, graphdata$NHANES_BMI_PCTL_DAY))
+}
 
 
 #To see what values are being graphed:
