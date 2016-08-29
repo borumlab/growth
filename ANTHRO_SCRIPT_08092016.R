@@ -2094,6 +2094,7 @@ xlsx <- "ANTHROPOMETRICS_GRAPH_VALUES.xlsx"
 xlsx <- gsub(" ","", paste(patient,"_", xlsx))
 write.xlsx2(data2,file=xlsx,row.names=FALSE, showNA=FALSE)
 
+data1 <- data1[complete.cases(data1),]
 
 #for y-axis labels
 z <- c(data1$HT_Z_SCORE, data1$WT_Z_SCORE, data1$BMI_Z_SCORE)
