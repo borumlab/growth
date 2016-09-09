@@ -828,317 +828,408 @@ output <- cbind.data.frame(DATE, AGE_YEARS, AGE_MO, AGE_DOL, RACE, SEX, HT1, MEA
 anthro <- Anthropometrics
 demo <- Demographics.Identified
 prodate <- Demographics.Identified$PKT_PROSPECTIVE_DATE
-naive <- ifelse(Demographics.Identified$STRATA[1] == "N", TRUE, FALSE)
 
-
-if (naive == TRUE) {
-  sub <- anthro[anthro$SOURCE!=1,]
-  anthro <- anthro[!(as.numeric(rownames(anthro)) %in% as.numeric(rownames(sub))),]
-} else if (naive == FALSE) {
-  sub1 <- anthro[anthro$DATE>=prodate & anthro$SOURCE!=1,]
-  sub2 <- anthro[anthro$DATE<prodate & (anthro$SOURCE==3),]
-  anthro <- anthro[!(as.numeric(rownames(anthro)) %in% as.numeric(rownames(sub1))),]
-  anthro <- anthro[!(as.numeric(rownames(anthro)) %in% as.numeric(rownames(sub2))),]
+if (anyNA(Demographics.Identified$STRATA[1]) == FALSE) {
+  naive <- ifelse(Demographics.Identified$STRATA[1] == "N", TRUE, FALSE)
+  if (naive == TRUE) {
+    sub <- anthro[anthro$SOURCE!=1,]
+    anthro <- anthro[!(as.numeric(rownames(anthro)) %in% as.numeric(rownames(sub))),]
+  } else if (naive == FALSE) {
+    sub1 <- anthro[anthro$DATE>=prodate & anthro$SOURCE!=1,]
+    sub2 <- anthro[anthro$DATE<prodate & (anthro$SOURCE==3),]
+    anthro <- anthro[!(as.numeric(rownames(anthro)) %in% as.numeric(rownames(sub1))),]
+    anthro <- anthro[!(as.numeric(rownames(anthro)) %in% as.numeric(rownames(sub2))),]
+  }
+} else if (anyNA(Demographics.Identified$STRATA[1]) == TRUE) {
+  anthro <- Anthropometrics
 }
 
 y1 <- as.Date(anthro$DATE[1], format="%m/%d/%Y")
 y2 <- as.Date(anthro$DATE[length(anthro[,1])], format="%m/%d/%Y")
 DATE <- seq(y1, y2, by="days")
 
+z <- length(DATE)
 
 #HT
-table <- anthro[complete.cases(anthro$HT),]
-HT <- as.numeric(na.omit(anthro$HT))
-i <- 1:(length(HT)-1)
-x1 <- HT[i]
-x2 <- HT[i+1]
-diffheight <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal1 <- as.numeric(x, units="days")
-
-HT_DAY <- c()
-for (i in seq(length(HT)-1)) {
-  HT_DAY <- c(HT_DAY, ((1:difftotal1[i]/difftotal1[i])*diffheight[i])+x1[i])
+if (all(is.na(anthro$HT)) == FALSE ) {
+  
+  table <- anthro[complete.cases(anthro$HT),]
+  HT <- as.numeric(na.omit(anthro$HT))
+  i <- 1:(length(HT)-1)
+  x1 <- HT[i]
+  x2 <- HT[i+1]
+  diffheight <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal1 <- as.numeric(x, units="days")
+  
+  HT_DAY <- c()
+  for (i in seq(length(HT)-1)) {
+    HT_DAY <- c(HT_DAY, ((1:difftotal1[i]/difftotal1[i])*diffheight[i])+x1[i])
+  }
+  HT_DAY <- c(table$HT[1], HT_DAY)
+  
+  a <- which(!is.na(anthro$HT))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  HT_DAY <- c(rep(NA, c-1), HT_DAY)
+  length(HT_DAY) <- z
+  
+} else if (all(is.na(anthro$HT)) == TRUE) {
+  HT_DAY <- NA
+  length(HT_DAY) <- z
 }
-HT_DAY <- c(table$HT[1], HT_DAY)
+
 
 #WT
-table <- anthro[complete.cases(anthro$WT),]
-y <- as.numeric(na.omit(anthro$WT))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-WT_DAY <- c()
-for (i in seq(length(y)-1)) {
-  WT_DAY <- c(WT_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$WT)) == FALSE ) {
+  
+  table <- anthro[complete.cases(anthro$WT),]
+  y <- as.numeric(na.omit(anthro$WT))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  WT_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    WT_DAY <- c(WT_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  WT_DAY <- c(table$WT[1], WT_DAY)
+  
+  a <- which(!is.na(anthro$WT))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  WT_DAY <- c(rep(NA, c-1), WT_DAY)
+  length(WT_DAY) <- z
+  
+}  else if (all(is.na(anthro$WT)) == TRUE) {
+  WT_DAY <- NA
+  length(WT_DAY) <- z
 }
-WT_DAY <- c(table$WT[1], WT_DAY)
+
 
 #HC
-table <- anthro[complete.cases(anthro$HC),]
-y <- as.numeric(na.omit(anthro$HC))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-HC_DAY <- c()
-for (i in seq(length(y)-1)) {
-  HC_DAY <- c(HC_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$HC)) == FALSE ) {
+  table <- anthro[complete.cases(anthro$HC),]
+  y <- as.numeric(na.omit(anthro$HC))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  HC_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    HC_DAY <- c(HC_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  HC_DAY <- c(table$HC[1], HC_DAY)
+  
+  a <- which(!is.na(anthro$HC))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  HC_DAY <- c(rep(NA, c-1), HC_DAY)
+  length(HC_DAY) <- z
+  
+}  else if (all(is.na(anthro$HC)) == TRUE) {
+  HC_DAY <- NA
+  length(HC_DAY) <- z
 }
-HC_DAY <- c(table$HC[1], HC_DAY)
+
+
+
+
 
 #UAC
-table <- anthro[complete.cases(anthro$UAC),]
-y <- as.numeric(na.omit(anthro$UAC))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
 
-UAC_DAY <- c()
-for (i in seq(length(y)-1)) {
-  UAC_DAY <- c(UAC_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$UAC)) == FALSE ) {
+  
+  
+  table <- anthro[complete.cases(anthro$UAC),]
+  y <- as.numeric(na.omit(anthro$UAC))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  UAC_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    UAC_DAY <- c(UAC_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  UAC_DAY <- c(table$UAC[1], UAC_DAY)
+  
+  a <- which(!is.na(anthro$UAC))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  UAC_DAY <- c(rep(NA, c-1), UAC_DAY)
+  length(UAC_DAY) <- z
+  
+}else if (all(is.na(anthro$UAC)) == TRUE) {
+  UAC_DAY <- NA
+  length(UAC_DAY) <- z
 }
-UAC_DAY <- c(table$UAC[1], UAC_DAY)
+
+
+
+
+
 
 #TSF
-table <- anthro[complete.cases(anthro$TSF),]
-y <- as.numeric(na.omit(anthro$TSF))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
 
-TSF_DAY <- c()
-for (i in seq(length(y)-1)) {
-  TSF_DAY <- c(TSF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$TSF)) == FALSE ) {
+  
+  table <- anthro[complete.cases(anthro$TSF),]
+  y <- as.numeric(na.omit(anthro$TSF))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  TSF_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    TSF_DAY <- c(TSF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  TSF_DAY <- c(table$TSF[1], TSF_DAY)
+  
+  a <- which(!is.na(anthro$TSF))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  TSF_DAY <- c(rep(NA, c-1), TSF_DAY)
+  length(TSF_DAY) <- z
+  
+  
+} else if (all(is.na(anthro$TSF)) == TRUE) {
+  TSF_DAY <- NA
+  length(TSF_DAY) <- z
 }
-TSF_DAY <- c(table$TSF[1], TSF_DAY)
 
 #SSF
-table <- anthro[complete.cases(anthro$SSF),]
-y <- as.numeric(na.omit(anthro$SSF))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-SSF_DAY <- c()
-for (i in seq(length(y)-1)) {
-  SSF_DAY <- c(SSF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$SSF)) == FALSE ) {
+  table <- anthro[complete.cases(anthro$SSF),]
+  y <- as.numeric(na.omit(anthro$SSF))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  SSF_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    SSF_DAY <- c(SSF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  SSF_DAY <- c(table$SSF[1], SSF_DAY)
+  
+  a <- which(!is.na(anthro$SSF))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  SSF_DAY <- c(rep(NA, c-1), SSF_DAY)
+  length(SSF_DAY) <- z
+  
+} else if (all(is.na(anthro$SSF)) == TRUE) {
+  SSF_DAY <- NA
+  length(SSF_DAY) <- z
 }
-SSF_DAY <- c(table$SSF[1], SSF_DAY)
 
 #USF
-table <- anthro[complete.cases(anthro$USF),]
-y <- as.numeric(na.omit(anthro$USF))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-USF_DAY <- c()
-for (i in seq(length(y)-1)) {
-  USF_DAY <- c(USF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$USF)) == FALSE ) {
+  table <- anthro[complete.cases(anthro$USF),]
+  y <- as.numeric(na.omit(anthro$USF))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  USF_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    USF_DAY <- c(USF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  USF_DAY <- c(table$USF[1], USF_DAY)
+  
+  a <- which(!is.na(anthro$USF))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  USF_DAY <- c(rep(NA, c-1), USF_DAY)
+  length(USF_DAY) <- z
+  
+} else if (all(is.na(anthro$USF)) == TRUE) {
+  USF_DAY <- NA
+  length(USF_DAY) <- z
 }
-USF_DAY <- c(table$USF[1], USF_DAY)
 
 #SISF
-table <- anthro[complete.cases(anthro$SISF),]
-y <- as.numeric(na.omit(anthro$SISF))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-SISF_DAY <- c()
-for (i in seq(length(y)-1)) {
-  SISF_DAY <- c(SISF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$SISF)) == FALSE ) {
+  table <- anthro[complete.cases(anthro$SISF),]
+  y <- as.numeric(na.omit(anthro$SISF))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  SISF_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    SISF_DAY <- c(SISF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  SISF_DAY <- c(table$SISF[1], SISF_DAY)
+  
+  a <- which(!is.na(anthro$SISF))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  SISF_DAY <- c(rep(NA, c-1), SISF_DAY)
+  length(SISF_DAY) <- z
+  
+} else if (all(is.na(anthro$SISF)) == TRUE) {
+  SISF_DAY <- NA
+  length(SISF_DAY) <- z
 }
-SISF_DAY <- c(table$SISF[1], SISF_DAY)
 
 #MBSF
-table <- anthro[complete.cases(anthro$MBSF),]
-y <- as.numeric(na.omit(anthro$MBSF))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-MBSF_DAY <- c()
-for (i in seq(length(y)-1)) {
-  MBSF_DAY <- c(MBSF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$MBSF)) == FALSE ) {
+  table <- anthro[complete.cases(anthro$MBSF),]
+  y <- as.numeric(na.omit(anthro$MBSF))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  MBSF_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    MBSF_DAY <- c(MBSF_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  MBSF_DAY <- c(table$MBSF[1], MBSF_DAY)
+  
+  a <- which(!is.na(anthro$MBSF))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  MBSF_DAY <- c(rep(NA, c-1), MBSF_DAY)
+  length(MBSF_DAY) <- z
+  
+} else if (all(is.na(anthro$MBSF)) == TRUE) {
+  MBSF_DAY <- NA
+  length(MBSF_DAY) <- z
 }
-MBSF_DAY <- c(table$MBSF[1], MBSF_DAY)
 
 #UC
-table <- anthro[complete.cases(anthro$UC),]
-y <- as.numeric(na.omit(anthro$UC))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-UC_DAY <- c()
-for (i in seq(length(y)-1)) {
-  UC_DAY <- c(UC_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$UC)) == FALSE ) {
+  table <- anthro[complete.cases(anthro$UC),]
+  y <- as.numeric(na.omit(anthro$UC))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  UC_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    UC_DAY <- c(UC_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  UC_DAY <- c(table$UC[1], UC_DAY)
+  
+  a <- which(!is.na(anthro$UC))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  UC_DAY <- c(rep(NA, c-1), UC_DAY)
+  length(UC_DAY) <- z
+  
+} else if (all(is.na(anthro$UC)) == TRUE) {
+  UC_DAY <- NA
+  length(UC_DAY) <- z
 }
-UC_DAY <- c(table$UC[1], UC_DAY)
 
 #R
-table <- anthro[complete.cases(anthro$R),]
-y <- as.numeric(na.omit(anthro$R))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-R_DAY <- c()
-for (i in seq(length(y)-1)) {
-  R_DAY <- c(R_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$R)) == FALSE ) {
+  table <- anthro[complete.cases(anthro$R),]
+  y <- as.numeric(na.omit(anthro$R))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  R_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    R_DAY <- c(R_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  R_DAY <- c(table$R[1], R_DAY)
+  
+  a <- which(!is.na(anthro$R))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  R_DAY <- c(rep(NA, c-1), R_DAY)
+  length(R_DAY) <- z
+  
+} else if (all(is.na(anthro$R)) == TRUE) {
+  R_DAY <- NA
+  length(R_DAY) <- z
 }
-R_DAY <- c(table$R[1], R_DAY)
 
 #X
-table <- anthro[complete.cases(anthro$X),]
-y <- as.numeric(na.omit(anthro$X))
-i <- 1:(length(y)-1)
-x1 <- y[i]
-x2 <- y[i+1]
-diffx <- (x2 - x1)
-Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
-Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
-x <- Date2 - Date1
-difftotal <- as.numeric(x, units="days")
-
-X_DAY <- c()
-for (i in seq(length(y)-1)) {
-  X_DAY <- c(X_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+if (all(is.na(anthro$X)) == FALSE ) {
+  table <- anthro[complete.cases(anthro$X),]
+  y <- as.numeric(na.omit(anthro$X))
+  i <- 1:(length(y)-1)
+  x1 <- y[i]
+  x2 <- y[i+1]
+  diffx <- (x2 - x1)
+  Date1 <- as.Date(table$DATE[i], format="%m/%d/%Y")
+  Date2 <- as.Date(table$DATE[i+1], format="%m/%d/%Y")
+  x <- Date2 - Date1
+  difftotal <- as.numeric(x, units="days")
+  
+  X_DAY <- c()
+  for (i in seq(length(y)-1)) {
+    X_DAY <- c(X_DAY, ((1:difftotal[i]/difftotal[i])*diffx[i])+x1[i])
+  }
+  X_DAY <- c(table$X[1], X_DAY)
+  
+  a <- which(!is.na(anthro$X))[1]
+  b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
+  c <- which(DATE==b)
+  X_DAY <- c(rep(NA, c-1), X_DAY)
+  length(X_DAY) <- z
+  
+} else if (all(is.na(anthro$X)) == TRUE) {
+  X_DAY <- NA
+  length(X_DAY) <- z
 }
-X_DAY <- c(table$X[1], X_DAY)
 
 rm(y,i,x1,x2,diffx, Date1, Date2, x, difftotal, y1, y2, diffheight, difftotal1, HT)
-
-#for length of interpolated data so it can fit in the anthro_interpolation table
-z <- length(DATE)
-a <- which(!is.na(anthro$HT))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-HT_DAY <- c(rep(NA, c-1), HT_DAY)
-length(HT_DAY) <- z
-
-
-a <- which(!is.na(anthro$WT))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-WT_DAY <- c(rep(NA, c-1), WT_DAY)
-length(WT_DAY) <- z
-
-a <- which(!is.na(anthro$HC))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-HC_DAY <- c(rep(NA, c-1), HC_DAY)
-length(HC_DAY) <- z
-
-a <- which(!is.na(anthro$UAC))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-UAC_DAY <- c(rep(NA, c-1), UAC_DAY)
-length(UAC_DAY) <- z
-
-a <- which(!is.na(anthro$TSF))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-TSF_DAY <- c(rep(NA, c-1), TSF_DAY)
-length(TSF_DAY) <- z
-
-a <- which(!is.na(anthro$SSF))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-SSF_DAY <- c(rep(NA, c-1), SSF_DAY)
-length(SSF_DAY) <- z
-
-a <- which(!is.na(anthro$USF))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-USF_DAY <- c(rep(NA, c-1), USF_DAY)
-length(USF_DAY) <- z
-
-a <- which(!is.na(anthro$SISF))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-SISF_DAY <- c(rep(NA, c-1), SISF_DAY)
-length(SISF_DAY) <- z
-
-a <- which(!is.na(anthro$MBSF))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-MBSF_DAY <- c(rep(NA, c-1), MBSF_DAY)
-length(MBSF_DAY) <- z
-
-
-a <- which(!is.na(anthro$UC))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-UC_DAY <- c(rep(NA, c-1), UC_DAY)
-length(UC_DAY) <- z
-
-a <- which(!is.na(anthro$R))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-R_DAY <- c(rep(NA, c-1), R_DAY)
-length(R_DAY) <- z
-
-a <- which(!is.na(anthro$X))[1]
-b <- as.Date(anthro$DATE[a], format="%m/%d/%Y")
-c <- which(DATE==b)
-X_DAY <- c(rep(NA, c-1), X_DAY)
-length(X_DAY) <- z
 
 
 MRNUMBER <- cbind(rep(unique(anthro$MRNUMBER),z))
