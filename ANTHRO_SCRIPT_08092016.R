@@ -11,16 +11,18 @@ anthro <- function() {
   if (!require("xlsxjars")) { 
     install.packages("xlsxjars") 
   } 
-  library(xlsxjars) 
-  if (!require("xlsx")) { 
-    install.packages("xlsx") 
-  } 
-  library(xlsx) 
+   library(xlsxjars) 
   
   if (!require("openxlsx")) { 
     install.packages("openxlsx") 
   } 
   library(openxlsx)
+  
+  if (!require("xlsx")) { 
+    install.packages("xlsx") 
+  } 
+  library(xlsx) 
+
   if (!require("lubridate")) { 
     install.packages("lubridate") 
   } 
@@ -49,7 +51,7 @@ anthro <- function() {
   
   data <- "ANTHROPOMETRICS_SOURCE.xlsx" 
   data <- gsub(" ","",paste(patient,"_",data)) 
-  Anthropometrics <- read.xlsx(data,sheetIndex=1,detectDates=TRUE) 
+  Anthropometrics <- read.xlsx(data,sheet=1,detectDates=TRUE) 
   Anthropometrics <- Anthropometrics[!is.na(Anthropometrics$MRNUMBER),]
   
   return(Anthropometrics)
