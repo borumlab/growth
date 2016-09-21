@@ -2,7 +2,7 @@
 
 anthro <- function() {
   
-  options(java.parameters = "-Xmx1000m")
+  options(java.parameters = "-Xmx10000m")
   
   if (!require("rJava")) { 
     install.packages("rJava") 
@@ -49,7 +49,7 @@ anthro <- function() {
   
   data <- "ANTHROPOMETRICS_SOURCE.xlsx" 
   data <- gsub(" ","",paste(patient,"_",data)) 
-  Anthropometrics <- read.xlsx(data,sheet=1,detectDates=TRUE) 
+  Anthropometrics <- read.xlsx(data,sheetIndex=1,detectDates=TRUE) 
   Anthropometrics <- Anthropometrics[!is.na(Anthropometrics$MRNUMBER),]
   
   return(Anthropometrics)
@@ -68,7 +68,7 @@ WHO.References <- read.csv('ANTHROPOMETRICS_WHO_REFERENCES_SOURCE_08012016.txt',
 
 setwd("G:/MySQL Database/Demographics/")
 DEMOGRAPHICS_SOURCE <- "DEMOGRAPHICS_SOURCE.xlsx"
-DEMOGRAPHICS_SOURCE <- read.xlsx(DEMOGRAPHICS_SOURCE,sheet=1, detectDates = TRUE)
+DEMOGRAPHICS_SOURCE <- read.xlsx(DEMOGRAPHICS_SOURCE,sheetIndex=1, detectDates = TRUE)
 Demographics.Identified <- DEMOGRAPHICS_SOURCE[which(DEMOGRAPHICS_SOURCE$MRNUMBER==Anthropometrics$MRNUMBER), ]
 
 #saves in patient's folder
@@ -2054,6 +2054,7 @@ finaltable <- finaltable[ , c(2, 1, 3:ncol(finaltable)) ]
 finaltable <- finaltable[, c(1:82, 84:ncol(finaltable), 83)] #putting comments at the end of the table
 finaltable <- as.data.frame(append(finaltable, list(AGE = AGE), after=4))
 
+options(java.parameters = "-Xmx10000m")
 
 #finaltable <- as.data.frame.numeric(finaltable)
 #finaltable[is.na(finaltable)] <- " "
