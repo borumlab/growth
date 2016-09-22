@@ -51,7 +51,7 @@ anthro <- function() {
   
   data <- "ANTHROPOMETRICS_SOURCE.xlsx" 
   data <- gsub(" ","",paste(patient,"_",data)) 
-  Anthropometrics <- read.xlsx(data,sheet=1,detectDates=TRUE) 
+  Anthropometrics <- read.xlsx(data,sheetIndex=1,detectDates=TRUE) 
   Anthropometrics <- Anthropometrics[!is.na(Anthropometrics$MRNUMBER),]
   
   return(Anthropometrics)
