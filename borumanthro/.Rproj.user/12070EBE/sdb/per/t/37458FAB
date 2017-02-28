@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Upload to database\n#'\n#' This function allow you to upload seizure or med data into the clinical and research tables of the MySQL database.\n#' It will be necessary to have access to the lab's database in order to do this\n#' @param data Data to be input into the research table\n#' @param str String defined as either \"MED\" or \"SEIZURE\"\n#' @param sourcedata Data to be input to the calculated table\n#' @param table Data to be added to the ranking table (only used if str==\"SEIZURE\")\n#' @keywords upload database\n#' @import RMySQL\n#function to upload anthros into MySQL\nuploadanthros <- function(finaltable){\n\n  library(RMySQL)\n\n  all_cons <- dbListConnections(MySQL())\n  for (con in all_cons) {\n    dbDisconnect(con)\n  }\n\n  # Input MySQL user name, password, database name, and host\n  # Then establish a connection to the database\n  print(\"When prompted, please input the MySQL username, password, database name, and host that you wish to use\")\n  print(\"To leave any of these fields blank, press the enter key without typing anything else\")\n  u <- readline(prompt=\"User: \")\n  p <- readline(prompt=\"Password: \")\n  d <- readline(prompt=\"Database Name: \")\n  h <- readline(prompt=\"Host: \")\n  connect <- dbConnect(MySQL(),user=u,password=p,dbname=d,host=h)\n\n  dbSendQuery(connect,paste(\"USE\",d))\n\n  mrnumber <- unique(finaltable$MRNUMBER)\n  table <- \"anthropometrics_id_research\"\n\n  exists <- dbGetQuery(connect,paste(\"SHOW TABLES FROM\",d,\"LIKE\",gsub(\" \",\"\",paste(\"'\",table,\"'\")),\";\"))\n  if (length(exists[,1])==1) {\n    exists.this <- dbGetQuery(connect,paste(\"SELECT * FROM\",table,\"WHERE MRNUMBER=\",mrnumber,\";\"))\n    if (dim(exists.this)[1]>0) {\n      print(paste(\"Data for patient with mrnumber\",mrnumber,\"already exists in table\",\n                  gsub(\" \",\"\",paste(table,\".\")),\"Would you like to update it?\"))\n      r <- \" \"\n      while (tolower(r)!=\"yes\" & tolower(r)!=\"no\") {\n        r <- readline(prompt=\"Type 'yes' or 'no': \")\n      }\n      if (tolower(r)==\"yes\") {\n        dbSendQuery(connect,paste(\"DELETE FROM\",table,\"WHERE MRNUMBER=\",mrnumber,\";\"))\n        dbWriteTable(connect,name=table,value=finaltable,append=TRUE)\n      }\n    } else {\n      dbWriteTable(connect,name=table,value=finaltable,append=TRUE)\n    }\n    print(paste(\"Table\",table,\"has been updated with data for this patient\"))\n  } else if (length(exists[,1])==0) {\n    dbWriteTable(connect,name=table,value=finaltable,append=TRUE)\n    print(paste(\"Table\",table,\"has been created and can be found in the database\"))\n  }\n}\n",
+    "created" : 1477498753995.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2001881558",
+    "id" : "37458FAB",
+    "lastKnownWriteTime" : 1477498816,
+    "last_content_update" : 1477498816722,
+    "path" : "G:/MySQL Database/Anthropometrics/Anthropometrics R Package/borumanthro/R/uploadanthros.R",
+    "project_path" : "R/uploadanthros.R",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

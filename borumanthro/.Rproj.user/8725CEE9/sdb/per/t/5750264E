@@ -1,0 +1,17 @@
+{
+    "contents" : "#function to upload anthros into MySQL\nuploadanthros <- function(finaltable){\n\n  library(RMySQL)\n\n  all_cons <- dbListConnections(MySQL())\n  for (con in all_cons) {\n    dbDisconnect(con)\n  }\n\n  # Input MySQL user name, password, database name, and host\n  # Then establish a connection to the database\n  print(\"When prompted, please input the MySQL username, password, database name, and host that you wish to use\")\n  print(\"To leave any of these fields blank, press the enter key without typing anything else\")\n  u <- readline(prompt=\"User: \")\n  p <- readline(prompt=\"Password: \")\n  d <- readline(prompt=\"Database Name: \")\n  h <- readline(prompt=\"Host: \")\n  connect <- dbConnect(MySQL(),user=u,password=p,dbname=d,host=h)\n\n  dbSendQuery(connect,paste(\"USE\",d))\n\n  mrnumber <- unique(finaltable$MRNUMBER)\n  table <- \"anthropometrics_id_research\"\n\n  exists <- dbGetQuery(connect,paste(\"SHOW TABLES FROM\",d,\"LIKE\",gsub(\" \",\"\",paste(\"'\",table,\"'\")),\";\"))\n  if (length(exists[,1])==1) {\n    exists.this <- dbGetQuery(connect,paste(\"SELECT * FROM\",table,\"WHERE MRNUMBER=\",mrnumber,\";\"))\n    if (dim(exists.this)[1]>0) {\n      print(paste(\"Data for patient with mrnumber\",mrnumber,\"already exists in table\",\n                  gsub(\" \",\"\",paste(table,\".\")),\"Would you like to update it?\"))\n      r <- \" \"\n      while (tolower(r)!=\"yes\" & tolower(r)!=\"no\") {\n        r <- readline(prompt=\"Type 'yes' or 'no': \")\n      }\n      if (tolower(r)==\"yes\") {\n        dbSendQuery(connect,paste(\"DELETE FROM\",table,\"WHERE MRNUMBER=\",mrnumber,\";\"))\n        dbWriteTable(connect,name=table,value=finaltable,append=TRUE)\n      }\n    } else {\n      dbWriteTable(connect,name=table,value=finaltable,append=TRUE)\n    }\n    print(paste(\"Table\",table,\"has been updated with data for this patient\"))\n  } else if (length(exists[,1])==0) {\n    dbWriteTable(connect,name=table,value=finaltable,append=TRUE)\n    print(paste(\"Table\",table,\"has been created and can be found in the database\"))\n  }\n}\n",
+    "created" : 1476728402359.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1403835330",
+    "id" : "5750264E",
+    "lastKnownWriteTime" : 1476965956,
+    "path" : "G:/Notebooks_E/e1(keto)/Candice Sammons/R Codes/borumanthro/uploadanthros function.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
